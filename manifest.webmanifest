@@ -1,0 +1,32 @@
+{
+  "name": "一凡工作台",
+  "short_name": "一凡",
+  "description": "一凡的学习与生活工作台：每日计划、坚持打卡、减脂记录、考研英语、管综199、资产评估、行测、申论写作",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF6F9",
+  "theme_color": "#F7A8B8",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
