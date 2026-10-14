@@ -12,7 +12,7 @@
 直接打开就能用（手机浏览器也一样）：
 
 ```
-https://<你的用户名>.github.io/yifan-workbench/
+https://yzx13830696790-beep.github.io/yifan-workbench/
 ```
 
 > 仓库推送后，在 **Settings → Pages** 里把 Source 选成 `main` / `/ (root)`，稍等一分钟即可访问。
@@ -74,7 +74,7 @@ https://<你的用户名>.github.io/yifan-workbench/
 ## 本地运行
 
 ```bash
-git clone https://github.com/<你的用户名>/yifan-workbench.git
+git clone https://github.com/yzx13830696790-beep/yifan-workbench.git
 cd yifan-workbench
 
 # 任意静态服务器都行（必须通过 http(s) 打开，直接双击 index.html 会让 Service Worker 失效）
