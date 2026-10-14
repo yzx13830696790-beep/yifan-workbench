@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>一凡工作台</title>
+<meta name="theme-color" content="#F7A8B8">
+<meta name="description" content="一凡工作台：每日计划、考研英语、资产评估、国考行测、创作复盘、申论素材">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="一凡工作台">
+<style>
+:root{
+  --p40:#FFF9FB; --p50:#FFF6F9; --p100:#FFE9F0; --p150:#FCDCE6; --p200:#FFD2E0;
+  --p300:#F7A8B8; --p400:#F2789F; --p500:#E8577A; --pink-txt:#D2567E;
+  --mint:#A8E6CF; --mintD:#4FAE86; --cream:#FFE9A8; --creamD:#C79A22;
+  --lav:#D8C7F0; --lavD:#7E5FB8; --sky:#BFE3F7; --skyD:#3E8FBF;
+  --text:#4A3B42; --muted:#9C8890; --line:#F6E2E9; --card:#FFFFFF;
+  --r:18px; --sh:0 2px 12px rgba(232,87,122,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  background:var(--p50);color:var(--text);font-size:14px;line-height:1.6;
+}
+.app{display:flex;min-height:100vh}
+
+/* ============ 左侧栏 ============ */
+.side{
+  width:118px;flex:0 0 118px;background:#fff;border-right:1px solid var(--line);
+  padding:calc(14px + env(safe-area-inset-top)) 8px 20px;position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;gap:4px;overflow-y:auto;
+}
+.side .logo{text-align:center;padding:6px 0 12px}
+.side .logo .cir{
+  width:52px;height:52px;border-radius:16px;margin:0 auto 6px;
+  background:linear-gradient(135deg,var(--p300),var(--lav));display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#fff;box-shadow:var(--sh);
+}
+.side .logo b{font-size:13px;display:block;color:var(--pink-txt)}
+.side .logo small{font-size:10px;color:var(--muted)}
+.side a{
+  display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:12px;color:var(--muted);
+  text-decoration:none;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;
+}
+.side a .ic{font-size:15px;width:18px;text-align:center}
+.side a.on{background:var(--p100);color:var(--pink-txt)}
+.side a:active{background:var(--p50)}
+.side .sync{margin-top:auto;font-size:10px;color:var(--muted);text-align:center;padding-top:12px}
+.side .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mintD);margin-right:3px}
+
+/* ============ 主区 ============ */
+main{flex:1;min-width:0;padding:calc(12px + env(safe-area-inset-top)) 12px 40px;max-width:720px}
+.view{display:none;animation:fade .2s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+.phead{margin-bottom:12px}
+.phead .l1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.phead h1{font-size:21px;font-weight:800;color:var(--pink-txt);letter-spacing:.3px}
+.phead .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.phead .tool{
+  background:#fff;border:1px solid var(--p200);color:var(--pink-txt);border-radius:999px;
+  padding:5px 12px;font-size:12px;font-weight:700;white-space:nowrap;
+}
+
+/* 四宫格统计 */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stats .s{border-radius:14px;padding:10px 6px;text-align:center}
+.stats .s b{display:block;font-size:19px;font-weight:800}
+.stats .s span{font-size:11px}
+.s1{background:var(--p100)} .s1 b{color:var(--p500)}
+.s2{background:#E6F7F0} .s2 b{color:var(--mintD)}
+.s3{background:#EFE9FA} .s3 b{color:var(--lavD)}
+.s4{background:#FFF6DC} .s4 b{color:var(--creamD)}
+
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.card h3{font-size:15px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.card h3 .ttl{display:flex;align-items:center;gap:6px}
+.card h3 .more{font-size:12px;font-weight:600;color:var(--p400)}
+.hint{font-size:12px;color:var(--muted);font-weight:400}
+
+/* 标签 */
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{
+  flex:0 0 auto;background:#fff;color:var(--muted);border:1.5px solid var(--line);
+  font-size:12.5px;padding:6px 14px;border-radius:999px;font-weight:600;
+}
+.tabs button.on{background:var(--p300);color:#fff;border-color:var(--p300);box-shadow:0 2px 8px rgba(247,168,184,.4)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;background:var(--p100);color:var(--pink-txt);white-space:nowrap}
+.pill.mint{background:#E6F7F0;color:var(--mintD)}
+.pill.lav{background:#EFE9FA;color:var(--lavD)}
+.pill.sky{background:#E6F4FB;color:var(--skyD)}
+.pill.cream{background:#FFF6DC;color:var(--creamD)}
+
+/* 表单 */
+label.f{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+input,select,textarea,button{font-family:inherit;font-size:14px;color:var(--text)}
+input[type=text],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p300)}
+textarea{resize:vertical;min-height:60px}
+button{background:var(--p300);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-weight:700;cursor:pointer}
+button:active{transform:scale(.98)}
+button.ghost{background:#fff;color:var(--pink-txt);border:1.5px solid var(--p200)}
+button.soft{background:var(--p100);color:var(--pink-txt)}
+button.del{background:#fff;color:#C94F6D;border:1.5px solid #F5C6D0}
+button.sm{padding:5px 11px;font-size:12px;border-radius:9px;font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.frm{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld{margin-bottom:10px}
+
+/* 单词卡 */
+.wcard{
+  background:linear-gradient(160deg,#FFEFF5 0%,#F7E9FB 100%);border-radius:20px;padding:20px 16px;text-align:center;
+  border:1.5px solid #FBD7E4;margin-top:10px;
+}
+.wcard .w{font-size:30px;font-weight:800;color:var(--pink-txt);letter-spacing:.5px;word-break:break-word}
+.wcard .ph{font-size:13px;color:var(--muted);margin-top:4px}
+.wcard .pos{font-size:15px;font-weight:700;margin-top:8px}
+.wcard .eg{background:#fff;border-radius:14px;padding:11px 13px;margin-top:12px;font-size:13.5px;text-align:left;line-height:1.65}
+.wcard .eg .cn{color:var(--muted);font-size:12.5px;margin-top:3px}
+.wcard .eg em{color:var(--p500);font-style:normal;font-weight:700}
+.wcard .mem{font-size:12.5px;color:var(--lavD);background:#fff;border-radius:12px;padding:9px 12px;margin-top:10px;text-align:left}
+.wnav{display:flex;align-items:center;gap:8px;margin-top:14px}
+.wnav button{flex:1}
+.wnav .cnt{font-size:13px;color:var(--muted);white-space:nowrap;padding:0 6px}
+.wprog{height:6px;background:#fff;border-radius:6px;overflow:hidden;margin-top:12px}
+.wprog>i{display:block;height:100%;background:var(--p300);border-radius:6px;transition:.3s}
+
+/* 听力卡 */
+.bbc{background:linear-gradient(150deg,#EAF4FD,#F3EBFB);border:1.5px solid #DCE8F8}
+.bbc .t{font-size:15px;font-weight:800;line-height:1.45}
+.bbc .meta{font-size:12px;color:var(--muted);margin-top:6px}
+.bbc .tip{font-size:12px;color:var(--skyD);margin-top:6px}
+
+/* 题目 */
+.q{background:var(--p40);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px}
+.q .qh{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.q .no{background:var(--p300);color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px}
+.q .stem{font-size:14.5px;font-weight:600;line-height:1.7;margin-bottom:11px}
+.q .opt{
+  padding:10px 13px;border-radius:13px;background:#fff;border:1.5px solid var(--line);
+  margin-bottom:7px;font-size:13.5px;transition:.15s;
+}
+.q .opt:active{transform:scale(.99)}
+.q .opt.right{background:#E6F7F0;border-color:var(--mintD);color:#2E7D5B;font-weight:700}
+.q .opt.wrong{background:#FDE8EC;border-color:#E88A9E;color:#B23B55;font-weight:700}
+.q .exp{margin-top:9px;font-size:12.5px;background:#fff;border-left:3px solid var(--p300);border-radius:10px;padding:9px 12px;line-height:1.7}
+.q .exp b{color:var(--pink-txt)}
+.q .kp{font-size:12px;color:var(--lavD);background:#F6F1FD;border-radius:9px;padding:6px 10px;margin-top:7px}
+
+/* 提示条 */
+.note{background:var(--p100);border-radius:12px;padding:9px 12px;font-size:12.5px;color:#8A6672;margin-bottom:10px;line-height:1.65}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:13px}
+
+/* 列表 */
+.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:none}
+.item .t{flex:1;min-width:0}
+.item .t b{font-weight:600;font-size:14px}
+.item .t small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.done{text-decoration:line-through;color:var(--muted)}
+.cbx{width:23px;height:23px;border-radius:8px;border:2px solid var(--p200);background:#fff;flex:0 0 23px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+.cbx.on{background:var(--p400);border-color:var(--p400)}
+.kv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.kv:last-child{border-bottom:none}
+
+/* 减脂 */
+.dcard{background:linear-gradient(150deg,#FFEFF5,#EFE9FA);border-radius:16px;padding:13px;font-size:13px}
+.photo{aspect-ratio:3/4;border-radius:14px;background:var(--p100);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:12px;gap:4px;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
+
+/* 创作复盘 */
+.idea{background:var(--p40);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px}
+.idea .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.idea .h b{font-size:14.5px;line-height:1.55;flex:1}
+.idea .fav{font-size:18px;color:var(--p200);cursor:pointer;flex:0 0 auto;line-height:1}
+.idea .fav.on{color:var(--p400)}
+.idea .sec{font-size:12.5px;line-height:1.7;margin-top:7px}
+.idea .sec em{color:var(--pink-txt);font-style:normal;font-weight:700}
+.linkbtns{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.linkbtns a{text-decoration:none;font-size:12px;padding:5px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--line);color:var(--text)}
+.linkbtns a.dy{border-color:#F5C6D0;color:#C94F6D}
+.linkbtns a.bz{border-color:#BEE1F5;color:var(--skyD)}
+
+/* 申论素材 */
+.mat{background:var(--p40);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px}
+.mat .tags{display:flex;gap:6px;margin-bottom:8px}
+.mat .c{font-size:14px;line-height:1.8}
+.mat .use{font-size:12px;color:var(--muted);margin-top:8px}
+.mat .acts{display:flex;gap:8px;margin-top:10px}
+
+/* 真题库（真题统计界面样式） */
+.mth{display:flex;font-size:11px;color:var(--muted);padding:0 8px 6px;border-bottom:1px solid var(--line)}
+.mth span:nth-child(1){flex:1;min-width:0}
+.mth span:nth-child(2){flex:0 0 46px;text-align:center}
+.mth span:nth-child(3){flex:0 0 46px;text-align:center}
+.mth span:nth-child(4){flex:0 0 60px;text-align:center}
+.mch{display:flex;align-items:center;gap:6px;padding:9px 8px;border-bottom:1px solid var(--line);cursor:pointer}
+.mch:last-child{border-bottom:none}
+.mch.on{background:var(--p50);border-radius:10px}
+.mch .nm{flex:1;min-width:0;font-weight:600;font-size:13px;line-height:1.35}
+.mch.on .nm{color:var(--pink-txt)}
+.mch .sc{flex:0 0 46px;text-align:center;font-size:12.5px;color:var(--text)}
+.mch .pt{flex:0 0 60px;text-align:center}
+.mch .typ{flex:0 0 auto;font-size:10.5px;color:var(--muted);background:var(--p40);border-radius:7px;padding:2px 6px;margin-left:2px}
+.freq{display:flex;gap:2.5px;margin-top:10px;overflow-x:auto;padding:2px 0 5px}
+.freq .fy{flex:0 0 22px;text-align:center}
+.freq .bar{height:36px;border-radius:5px;background:var(--p40);display:flex;align-items:flex-end;justify-content:center;font-size:9px;color:#9C8890;padding-bottom:2px}
+.freq .bar.h1{background:var(--p150);color:#8A6672}
+.freq .bar.h2{background:var(--p300);color:#fff}
+.freq .bar.h3{background:var(--p400);color:#fff}
+.freq .yr{font-size:8.5px;color:var(--muted);margin-top:3px}
+.papers{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+.pp{background:var(--p40);border:1.5px solid var(--line);border-radius:14px;padding:9px 6px;text-align:center}
+.pp.done{background:#E6F7F0;border-color:var(--mintD)}
+.pp.wrong{background:#FDE8EC;border-color:#E88A9E}
+.pp.combo{border-color:var(--p400);box-shadow:0 0 0 2px var(--p100)}
+.pp .yr{font-size:12px;font-weight:700;color:var(--text)}
+.pp .no{font-size:16px;font-weight:800;color:var(--pink-txt);margin:1px 0}
+.pp .ty{font-size:10.5px;color:var(--muted)}
+.pp .mk{display:flex;gap:4px;margin-top:6px;justify-content:center}
+.pp .mk b{width:23px;height:23px;border-radius:8px;border:1.5px solid var(--p200);background:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-weight:400}
+.pp .mk b.on{background:var(--mintD);border-color:var(--mintD);color:#fff}
+.pp .mk b.wr.on{background:#E8577A;border-color:#E8577A;color:#fff}
+
+/* 408 打卡：日历 + 考点清单 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .lb{text-align:center;font-size:11px;color:var(--muted);padding:2px 0}
+.cald{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1.5px solid var(--line);font-size:13px;cursor:pointer;background:#fff;color:var(--text)}
+.cald.has{background:var(--p150);color:var(--pink-txt);font-weight:700;border-color:var(--p200)}
+.cald.td{background:var(--p400);color:#fff;font-weight:700;border-color:var(--p400)}
+.cald.sel{outline:2px solid var(--p300);outline-offset:1px}
+.caldt{margin-top:10px;background:var(--p40);border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.75;min-height:54px;white-space:pre-wrap;color:var(--text)}
+.item.tm{background:var(--p50);border-radius:10px;padding-left:8px;padding-right:8px;margin:2px 0}
+.errin{width:58px;flex:0 0 58px;padding:5px 7px;border:1.5px solid var(--line);border-radius:10px;text-align:center;font-size:13px;background:#fff}
+.errin:focus{outline:none;border-color:var(--p300)}
+.sub-h{display:flex;align-items:center;gap:8px;margin:14px 0 6px;font-size:13.5px;font-weight:700;color:var(--text)}
+.sub-h .n{margin-left:auto;font-size:11.5px;font-weight:400;color:var(--muted)}
+
+/* 课表管理 */
+.sbwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sbgrid{display:grid;grid-template-columns:52px repeat(7,1fr);gap:3px;min-width:420px}
+.sbgrid .h{text-align:center;font-size:11px;color:var(--muted);padding:3px 0;font-weight:600}
+.sbgrid .h.today{color:var(--pink-txt);font-weight:700}
+.sbslot{font-size:10.5px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.25}
+.sbslot b{font-size:11px;color:var(--text);font-weight:600}
+.sbcell{position:relative;min-height:46px;border-radius:8px;background:var(--p40);border:1px dashed var(--line)}
+.sbwrap.dense .sbcell{min-height:34px}
+.sbcard{position:absolute;left:1px;right:1px;top:1px;bottom:1px;border-radius:8px;padding:3px 4px;font-size:10.5px;line-height:1.3;overflow:hidden;cursor:pointer}
+.sbcard .cn{font-weight:700;font-size:11px}
+.sbcard .cp{opacity:.85;font-size:9.5px;word-break:break-all}
+.sbbe{background:#fff;border:1.5px dashed var(--p200);border-radius:8px;min-height:46px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--p200);cursor:pointer}
+.sbwrap.dense .sbbe{min-height:52px}
+.sbtoday{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px}
+.sbtc{flex:0 0 116px;border-radius:14px;padding:10px 9px;color:var(--text)}
+.sbtc .tm{font-size:11.5px;font-weight:700;opacity:.8}
+.sbtc .nm{font-size:14px;font-weight:700;margin:3px 0 2px;line-height:1.35}
+.sbtc .pl{font-size:11px;opacity:.85}
+.sbaxis{flex:0 0 44px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
+.sbfun{display:grid;grid-template-columns:repeat(5,1fr);gap:10px 6px;margin-top:4px}
+.sbfun button{background:transparent;border:none;color:var(--text);padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:400}
+.sbfun .fi{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 40px}
+.sbfun span{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.25}
+.sbrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.sbrow:last-child{border-bottom:none}
+.sbrow .tt{flex:1;min-width:0}
+.sbrow .tt b{font-size:13.5px;font-weight:600}
+.sbrow .tt small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.sbsw{display:flex;gap:6px;flex-wrap:wrap}
+.sbsw b{width:30px;height:30px;border-radius:10px;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.sbsw b.on{border-color:var(--text)}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(74,59,66,.94);color:#fff;padding:9px 18px;border-radius:999px;font-size:13px;z-index:99;opacity:0;pointer-events:none;transition:.25s}
+.toast.on{opacity:1}
+
+@media(max-width:400px){
+  .side{width:96px;flex:0 0 96px;padding-left:5px;padding-right:5px}
+  .side a{font-size:11.5px;padding:8px 5px;gap:6px}
+  .side .logo .cir{width:44px;height:44px;font-size:20px}
+  .wcard .w{font-size:26px}
+  .stats .s b{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo">
+      <div class="cir">凡</div>
+      <b>一凡工作台</b>
+      <small>本地实时保存</small>
+    </div>
+    <a class="on" data-v="plan"><span class="ic">📋</span>每日计划</a>
+    <a data-v="eng"><span class="ic">📖</span>考研英语</a>
+    <a data-v="asset"><span class="ic">📊</span>资产评估</a>
+    <a data-v="xg"><span class="ic">✏️</span>国考行测</a>
+    <a data-v="create"><span class="ic">🎬</span>创作复盘</a>
+    <a data-v="sl"><span class="ic">🖋️</span>申论素材</a>
+    <a data-v="math"><span class="ic">📐</span>考研数学</a>
+    <a data-v="cs408"><span class="ic">💻</span>408考研</a>
+    <a data-v="sb"><span class="ic">🗓️</span>课表管理</a>
+    <a data-v="install"><span class="ic">📲</span>装到桌面</a>
+    <a data-v="guide"><span class="ic">❓</span>使用说明</a>
+    <div class="sync"><span class="dot"></span>数据实时保存</div>
+  </aside>
+
+  <main>
+    <section class="view on" id="v-plan"></section>
+    <section class="view" id="v-eng"></section>
+    <section class="view" id="v-asset"></section>
+    <section class="view" id="v-xg"></section>
+    <section class="view" id="v-create"></section>
+    <section class="view" id="v-sl"></section>
+    <section class="view" id="v-math"></section>
+    <section class="view" id="v-cs408"></section>
+    <section class="view" id="v-sb"></section>
+    <section class="view" id="v-install"></section>
+    <section class="view" id="v-guide"></section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+/* ==================== 状态 ==================== */
+const KEY = "yifan_workbench_v2";
+const CATS = ["青年发展","基层治理","民生","经济","生态文明","文化自信"];
+const XGTYPE = ["资料分析","判断推理","言语理解","数量关系"];
+
+function blank(){
+  return {
+    plans:[], checks:[], body:[], diet:[], poses:[],
+    wordLog:{}, wordIdx:0, qLog:{}, ideaFav:[], todoIdeas:[], matFav:[], matCopy:[],
+    mathSel:0, mathType:"全部", mathDone:{}, mathWrong:{}, mathPapers:[], mathCombo:[], mathAdd:false,
+    c408:{checked:{}, err:{}, today:[], rec:{}, num:8, calY:0, calM:0, sel:0},
+    sb:{courses:[], slots:[], term:{name:"", start:"", weeks:18}, routine:[], weekOff:0, theme:0, dense:false, showNo:true, editing:false, remind:10, notify:false, alarm:"07:00", alarmOn:false, adjust:{}},
+    meta:{name:"一凡", weightGoal:55, kcalGoal:1400, examName:"考研", examDate:"2026-12-19"}
+  };
+}
+/* 课表默认值补全：首次使用或旧数据时把默认时间表/示例课程补上 */
+function sbFill(d){
+  d.sb = Object.assign(blank().sb, d.sb||{});
+  if(!Array.isArray(d.sb.courses)) d.sb.courses=[];
+  if(!Array.isArray(d.sb.routine)) d.sb.routine=[];
+  if(typeof d.sb.adjust!=="object"||!d.sb.adjust) d.sb.adjust={};
+  if(typeof d.sb.notified!=="object"||!d.sb.notified) d.sb.notified={};
+  d.sb.term = Object.assign({name:"", start:"", weeks:18}, d.sb.term||{});
+  if(!Array.isArray(d.sb.slots) || !d.sb.slots.length){
+    d.sb.slots = (typeof SB_SLOTS_DEFAULT!=="undefined")? SB_SLOTS_DEFAULT.map(function(x){ return x.slice(); }) : [];
+  }
+  if(!d.sb.courses.length && typeof SB_COURSES_DEFAULT!=="undefined"){
+    d.sb.courses = SB_COURSES_DEFAULT.map(function(c){ return Object.assign({}, c, {id:Date.now()+Math.random()}); });
+  }
+  if(!d.sb.routine.length && typeof SB_ROUTINE_DEFAULT!=="undefined"){
+    d.sb.routine = SB_ROUTINE_DEFAULT.map(function(r){ return Object.assign({}, r, {id:Date.now()+Math.random()}); });
+  }
+  return d;
+}
+let S = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY); if(!raw) return sbFill(blank());
+    const d = JSON.parse(raw), b = blank();
+    d.meta = Object.assign(b.meta, d.meta||{});
+    ["plans","checks","body","diet","poses","ideaFav","todoIdeas","matFav","matCopy","mathPapers","mathCombo"].forEach(k=>{ if(!Array.isArray(d[k])) d[k]=[]; });
+    d.wordLog = d.wordLog||{}; d.qLog = d.qLog||{}; d.wordIdx = d.wordIdx||0;
+    d.mathDone = d.mathDone||{}; d.mathWrong = d.mathWrong||{};
+    d.mathSel = d.mathSel||0; d.mathType = d.mathType||"全部"; d.mathAdd = !!d.mathAdd;
+    const cb = blank().c408;
+    d.c408 = Object.assign(cb, d.c408||{});
+    ["checked","err","rec"].forEach(k=>{ if(typeof d.c408[k]!=="object"||!d.c408[k]) d.c408[k]={}; });
+    if(!Array.isArray(d.c408.today)) d.c408.today=[];
+    d.c408.num = d.c408.num||8;
+    return sbFill(d);
+  }catch(e){ return sbFill(blank()); }
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function today(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function toast(t){ const el=document.getElementById("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1700); }
+
+/* 每日确定性随机：同一天内容稳定，次日自动更新 */
+function seedOf(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function rnd(seed){ let x=seed||1; return function(){ x^=x<<13; x>>>=0; x^=x>>17; x^=x<<5; x>>>=0; return x/4294967296; }; }
+function pick(arr,n,seed){
+  const r=rnd(seed), idx=arr.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); const t=idx[i]; idx[i]=idx[j]; idx[j]=t; }
+  return idx.slice(0,n).map(i=>arr[i]);
+}
+function qid(q){ return q[0]+"|"+q[3]; }
+function curWord(){
+  const n = WORDS.length;
+  return WORDS[((S.wordIdx % n) + n) % n];
+}
+
+/* ==================== 导航 ==================== */
+function go(v){
+  document.querySelectorAll(".side a").forEach(a=>a.classList.toggle("on", a.dataset.v===v));
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("on"));
+  document.getElementById("v-"+v).classList.add("on");
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".side a").forEach(a=>a.addEventListener("click",()=>go(a.dataset.v)));
+function $(id){ return document.getElementById(id); }
+function phead(title, emoji, sub, toolText, toolFn){
+  return "<div class='phead'><div class='l1'><div><h1>"+title+" <span style='font-size:16px'>"+emoji+"</span></h1>"
+    + "<div class='sub'>"+esc(sub)+"</div></div>"
+    + (toolText? "<button class='tool' onclick=\""+toolFn+"\">"+toolText+"</button>":"")
+    + "</div></div>";
+}
+
+/* ==================== ① 每日计划 ==================== */
+function renderPlan(){
+  const td = today();
+  const d = new Date();
+  const wk = ["周日","周一","周二","周三","周四","周五","周六"][d.getDay()];
+  const day = S.plans.filter(p=>p.date===td);
+  const doneN = day.filter(p=>p.done).length;
+  const rate = day.length? Math.round(doneN/day.length*100):0;
+  const examDays = Math.ceil((new Date(S.meta.examDate+"T00:00:00") - new Date(td+"T00:00:00"))/86400000);
+  const weight = S.body.length? S.body.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0].weight : null;
+  const dietList = S.diet.filter(x=>x.date===td);
+  const dietKcal = dietList.reduce((a,b)=>a+(+b.kcal||0),0);
+  const poseN = S.poses.filter(x=>x.date===td).length;
+  const sortedW = S.body.slice().sort((a,b)=>a.date.localeCompare(b.date));
+
+  let h = phead("每日计划","🌼", td.slice(0,4)+"年"+(+td.slice(5,7))+"月"+(+td.slice(8,10))+"日 · "+wk+" · 数据实时保存",
+                "历史记录","showHistory()");
+
+  h += "<div class='stats'>"
+    + "<div class='s s1'><b>"+day.length+"</b><span>今日任务</span></div>"
+    + "<div class='s s2'><b>"+doneN+"</b><span>已完成</span></div>"
+    + "<div class='s s3'><b>"+(day.length-doneN)+"</b><span>待完成</span></div>"
+    + "<div class='s s4'><b>"+rate+"%</b><span>完成率</span></div>"
+    + "</div>";
+
+  h += "<div class='card'><h3><span class='ttl'>💗 减脂打卡</span><span class='hint'>目标 "+(S.meta.weightGoal||"--")+" kg</span></h3>"
+    + "<div class='frm'><div class='fld'><label class='f'>今日体重（kg）</label><input type='number' step='0.1' id='bw' placeholder='如 52.5'></div>"
+    + "<div class='fld'><label class='f'>今日饮食记录</label><input type='text' id='df' placeholder='早餐/午餐 食物'></div></div>"
+    + "<div class='row'><button onclick='addBody()'>记录体重</button>"
+    + "<input type='number' id='dk' placeholder='kcal' style='width:86px;padding:9px 10px'>"
+    + "<button class='soft' onclick='addDiet()'>记一条饮食</button></div>"
+    + "<div class='row' style='margin-top:9px;font-size:12px;color:var(--muted)'>"
+    + (weight!=null? "最新体重 "+weight+" kg" : "今天还没记录体重哦")
+    + " ｜ 今日 "+dietList.length+" 条饮食 · 累计 "+dietKcal+" kcal</div>"
+    + "</div>";
+
+  h += "<div class='card'><h3><span class='ttl'>🐳 我的减脂数据卡</span></h3>"
+    + (sortedW.length>1? "<div style='margin-bottom:10px'>"+lineSvg(sortedW.map(x=>x.weight),"kg",S.meta.weightGoal)+"</div>"
+        : "<div class='dcard' style='margin-bottom:10px'>记录第一条体重，生成你的专属数据曲线吧～</div>")
+    + "<div class='row' style='font-size:12.5px'>"
+    + "<span class='pill'>体重记录 "+sortedW.length+" 条</span>"
+    + "<span class='pill lav'>饮食累计 "+S.diet.length+" 条</span>"
+    + "<span class='pill mint'>普拉提打卡 "+S.poses.length+" 次</span>"
+    + (sortedW.length>1? "<span class='pill cream'>变化 "+((sortedW[sortedW.length-1].weight-sortedW[0].weight)>=0?"+":"")+(sortedW[sortedW.length-1].weight-sortedW[0].weight).toFixed(1)+" kg</span>":"")
+    + "</div></div>";
+
+  h += "<div class='card'><h3><span class='ttl'>🧘 体态塑形 · 普拉提跟练</span><span class='hint'>今日已打卡 "+poseN+" 次</span></h3>"
+    + "<div class='row'><button class='soft' onclick='$(\"poseFile\").click()'>📷 拍照打卡</button>"
+    + "<button class='ghost' onclick='addPoseNoPhoto()'>今日跟练完成 ✓</button></div>"
+    + "<input type='file' id='poseFile' accept='image/*' style='display:none' onchange='addPose(event)'>"
+    + "<div class='photos' id='poseBox'>"+posePhotos()+"</div>"
+    + "<div style='font-size:11.5px;color:var(--muted);margin-top:7px'>照片只保存在本机浏览器。</div>"
+    + "</div>";
+
+  h += "<div class='card'><h3><span class='ttl'>✅ 今日任务清单</span><span class='hint'>"+doneN+"/"+day.length+"</span></h3>"
+    + "<div class='row' style='margin-bottom:10px'><input type='text' id='pt' placeholder='新增任务...' style='flex:1;min-width:140px'>"
+    + "<button onclick='addPlan()' style='padding:9px 15px'>+</button></div>"
+    + "<div style='font-size:12px;color:var(--muted);margin-bottom:4px'>待完成</div>"
+    + (day.filter(p=>!p.done).map(itemPlan).join("") || "<div class='empty' style='padding:12px'>今天都完成啦 🎉</div>")
+    + (day.filter(p=>p.done).length? "<div style='font-size:12px;color:var(--muted);margin:10px 0 4px'>已完成</div>"+day.filter(p=>p.done).map(itemPlan).join("") : "")
+    + "</div>";
+
+  h += "<div class='card'><h3><span class='ttl'>⏳ 学习总览</span></h3>"
+    + "<div class='stats' style='margin-bottom:0'><div class='s s1'><b>"+(examDays>=0?examDays:0)+"</b><span>"+esc(S.meta.examName)+"倒计时(天)</span></div>"
+    + "<div class='s s3'><b>"+S.plans.filter(p=>!p.done).length+"</b><span>累计待办</span></div>"
+    + "<div class='s s2'><b>"+Object.keys(S.wordLog).length+"</b><span>背词天数</span></div>"
+    + "<div class='s s4'><b>"+Object.keys(S.qLog).length+"</b><span>刷题天数</span></div></div></div>";
+
+  $("v-plan").innerHTML = h;
+}
+function itemPlan(p){
+  return "<div class='item'><div class='cbx "+(p.done?"on":"")+"' onclick='togglePlan("+p.id+")'>"+(p.done?"✓":"")+"</div>"
+    + "<div class='t'><b class='"+(p.done?"done":"")+"'>"+esc(p.title)+"</b>"+(p.tag?"<small>"+esc(p.tag)+"</small>":"")+"</div>"
+    + "<button class='sm del' onclick='delPlan("+p.id+")'>删</button></div>";
+}
+function posePhotos(){
+  const list = S.poses.slice(-4);
+  let out = "";
+  for(let i=0;i<4;i++){
+    const p = list[i];
+    out += p&&p.photo? "<div class='photo'><img src='"+p.photo+"' alt='打卡'></div>"
+      : "<div class='photo'><span style='font-size:20px'>📷</span><span>"+(p?esc(p.date.slice(5)):"待打卡")+"</span></div>";
+  }
+  return out;
+}
+function addPose(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    S.poses.push({date:today(), photo:r.result});
+    S.plans.push({id:Date.now(), title:"普拉提跟练", date:today(), tag:"体态塑形", done:true});
+    save(); toast("拍照打卡成功"); renderAll();
+  };
+  r.readAsDataURL(f);
+  e.target.value="";
+}
+function addPoseNoPhoto(){
+  S.poses.push({date:today(), photo:""});
+  S.plans.push({id:Date.now(), title:"普拉提跟练", date:today(), tag:"体态塑形", done:true});
+  save(); toast("今日跟练已记录 ✓"); renderAll();
+}
+function addPlan(){
+  const t = $("pt").value.trim(); if(!t){ toast("先写点内容吧"); return; }
+  S.plans.push({id:Date.now(), title:t, date:today(), tag:"", done:false});
+  save(); $("pt").value=""; toast("已添加"); renderAll();
+}
+function togglePlan(id){ const p=S.plans.find(x=>x.id===id); if(p){ p.done=!p.done; save(); renderAll(); } }
+function delPlan(id){ S.plans=S.plans.filter(x=>x.id!==id); save(); renderAll(); }
+function addBody(){
+  const v=parseFloat($("bw").value); if(isNaN(v)){ toast("请输入体重"); return; }
+  const td=today(), ex=S.body.find(x=>x.date===td);
+  if(ex) ex.weight=v; else S.body.push({date:td, weight:v});
+  save(); $("bw").value=""; toast("已记录 "+v+" kg"); renderAll();
+}
+function addDiet(){
+  const f=$("df").value.trim(); if(!f){ toast("先写食物名称"); return; }
+  const k=parseInt($("dk").value)||0;
+  S.diet.push({date:today(), food:f, kcal:k});
+  save(); $("df").value=""; $("dk").value=""; toast("已记一条饮食"); renderAll();
+}
+function showHistory(){
+  const td=today();
+  const past = S.plans.filter(p=>p.date!==td).sort((a,b)=>b.date.localeCompare(a.date));
+  const w = S.body.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+  let h = phead("历史记录","🗂","查看以前的任务与体重记录","返回","go('plan')");
+  h += "<div class='card'><h3><span class='ttl'>📋 历史任务</span><span class='hint'>共 "+past.length+" 条</span></h3>";
+  if(!past.length) h += "<div class='empty'>还没有历史任务</div>";
+  else{
+    const byDate = {};
+    past.forEach(p=>{ (byDate[p.date]=byDate[p.date]||[]).push(p); });
+    Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).slice(0,30).forEach(dt=>{
+      const arr = byDate[dt];
+      h += "<div style='margin-top:11px'><div style='font-size:12.5px;font-weight:700;color:var(--pink-txt)'>"+dt
+        + " <span class='pill' style='margin-left:6px'>"+arr.filter(x=>x.done).length+"/"+arr.length+"</span></div>"
+        + arr.map(p=>"<div class='kv'><span class='"+(p.done?"done":"")+"'>"+esc(p.title)+"</span></div>").join("")+"</div>";
+    });
+  }
+  h += "</div>";
+  h += "<div class='card'><h3><span class='ttl'>⚖️ 最近体重</span></h3>"
+    + (w.length? w.map(x=>"<div class='kv'><span>"+esc(x.date)+"</span><b>"+x.weight+" kg</b></div>").join("") : "<div class='empty'>暂无记录</div>")
+    + "</div>";
+  $("v-plan").innerHTML = h;
+}
+
+/* ==================== ② 考研英语 ==================== */
+let engTab = "词条背诵";
+let engDir = "en";
+function renderEng(){
+  const td = today();
+  const learned = S.wordLog[td]||{};
+  const learnedN = Object.keys(learned).length;
+  const w = curWord();
+  const idx = ((S.wordIdx % WORDS.length)+WORDS.length)%WORDS.length;
+  const bbc = BBC[seedOf(td+"bbc") % BBC.length];
+  const pctv = Math.min(100, Math.round(learnedN/30*100));
+
+  let h = phead("考研英语学习","📖","每日30词 · BBC听力跟读 · 素材每日更新","词汇本","showWordBook()");
+  h += "<div class='card'><h3><span class='ttl'>🌞 每日词汇任务（30词）</span><span class='pill'>"+learnedN+"/30</span></h3>"
+    + "<div class='tabs'>"+["词条背诵","场景默写","趣味记忆"].map(t=>"<button class='"+(t===engTab?"on":"")+"' onclick=\"setEngTab('"+t+"')\">"+t+"</button>").join("")+"</div>";
+
+  if(engTab==="词条背诵"){
+    const isLearned = !!learned[w[0]];
+    h += "<div class='wcard'>"
+      + "<div class='w'>"+esc(w[0])+"</div>"
+      + "<div class='ph'>"+esc(w[1])+"</div>"
+      + "<div class='pos'>"+esc(w[2])+"</div>"
+      + "<div class='eg'>"+hl(w[3],w[0])+"<div class='cn'>"+esc(w[4])+"</div></div>"
+      + "<div class='mem'>💡 "+esc(w[5])+"</div>"
+      + "<div class='wprog'><i style='width:"+pctv+"%'></i></div>"
+      + "<div class='wnav'>"
+      + "<button class='ghost' onclick='prevWord()'>← 上一个</button>"
+      + "<span class='cnt'>"+(idx+1)+" / "+WORDS.length+"</span>"
+      + "<button onclick='nextWord()'>下一个 →</button></div>"
+      + "<div class='row' style='justify-content:center;margin-top:10px'>"
+      + "<button class='soft' onclick='markWord(\""+esc(w[0])+"\")'>"+(isLearned?"已背 ✓":"标记为已背 ○")+"</button>"
+      + "<button class='ghost' onclick='speak(\""+esc(w[0])+"\")'>🔊 发音</button></div>"
+      + "</div>";
+  }else if(engTab==="场景默写"){
+    h += "<div class='row' style='margin-top:10px'><button class='sm "+(engDir==="en"?"":"ghost")+"' onclick=\"setDir('en')\">英译中</button>"
+      + "<button class='sm "+(engDir==="cn"?"":"ghost")+"' onclick=\"setDir('cn')\">中译英</button></div>"
+      + "<div class='note' style='margin-top:10px'>默写今日 3 个词，写完点「显示答案」自检。</div>";
+    pick(WORDS,3,seedOf(td+"write")).forEach((ww,i)=>{
+      const q = engDir==="en"? ww[0] : ww[2];
+      const a = engDir==="en"? ww[2] : ww[0];
+      h += "<div class='q'><div class='stem'>"+(i+1)+". "+esc(q)+"</div>"
+        + "<button class='sm ghost' onclick=\"tg('wa"+i+"')\">显示答案</button>"
+        + "<div id='wa"+i+"' style='display:none;margin-top:7px;font-weight:700;color:var(--pink-txt)'>"+esc(a)+"</div></div>";
+    });
+  }else{
+    h += "<div class='note' style='margin-top:10px'>先看单词想意思，再看记忆法。今日 3 个词：</div>";
+    pick(WORDS,3,seedOf(td+"fun")).forEach((ww,i)=>{
+      h += "<div class='q'><div class='stem'>"+esc(ww[0])+" <span style='font-weight:400;color:var(--muted)'>"+esc(ww[1])+"</span></div>"
+        + "<button class='sm ghost' onclick=\"tg('fa"+i+"')\">看记忆法</button>"
+        + "<div id='fa"+i+"' style='display:none;margin-top:7px'>"
+        + "<div style='font-weight:700'>"+esc(ww[2])+"</div>"
+        + "<div class='kp' style='margin-top:6px'>💡 "+esc(ww[5])+"</div></div></div>";
+    });
+  }
+  h += "</div>";
+
+  h += "<div class='card bbc'><h3><span class='ttl'>🎧 BBC 听力素材 · 每日30分钟盲听跟读</span></h3>"
+    + "<div class='t'>"+esc(bbc[0])+"</div>"
+    + "<div class='meta'>时长参考 "+esc(bbc[1])+" ｜ 难度 "+esc(bbc[2])+" ｜ 主题 "+esc(bbc[3])+"</div>"
+    + "<div class='tip'>建议先盲听 2 遍再看原文</div>"
+    + "<div class='row' style='margin-top:11px'><button onclick='playText(\""+esc(bbc[0])+"\")'>▶ 播放朗读</button>"
+    + ["0.75x","1.0x","1.25x"].map(r=>"<button class='sm "+(r==="1.0x"?"":"ghost")+"' onclick=\"setRate('"+r+"')\">"+r+"</button>").join("")
+    + "</div></div>";
+  $("v-eng").innerHTML = h;
+}
+function hl(txt, word){
+  const re = new RegExp("("+word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\w*)","ig");
+  return esc(txt).replace(re,"<em>$1</em>");
+}
+function setEngTab(t){ engTab=t; renderEng(); }
+function setDir(d){ engDir=d; renderEng(); }
+function tg(id){ const el=$(id); if(el) el.style.display = el.style.display==="none"?"block":"none"; }
+function nextWord(){ S.wordIdx = (S.wordIdx+1)%WORDS.length; save(); renderEng(); const c=document.querySelector("main"); if(c) c.scrollTop=0; }
+function prevWord(){ S.wordIdx = (S.wordIdx-1+WORDS.length)%WORDS.length; save(); renderEng(); }
+function markWord(w){ const td=today(); S.wordLog[td]=S.wordLog[td]||{}; S.wordLog[td][w]=true; save(); toast("已背 ✓"); renderEng(); }
+let rate = 1;
+function setRate(r){ rate = parseFloat(r); toast("语速 "+r); }
+function speak(w){ try{ const u=new SpeechSynthesisUtterance(w); u.lang="en-US"; u.rate=rate; speechSynthesis.speak(u); }catch(e){ toast("当前浏览器不支持朗读"); } }
+function playText(t){ try{ const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=rate; speechSynthesis.speak(u); }catch(e){ toast("当前浏览器不支持朗读"); } }
+function showWordBook(){
+  const all = Object.keys(S.wordLog).sort((a,b)=>b.localeCompare(a));
+  let h = phead("我的词汇本","📚","按天查看已背单词，共 "+all.length+" 天","返回","go('eng')");
+  h += "<div class='card'>";
+  if(!all.length) h += "<div class='empty'>还没有背词记录，去「词条背诵」标记已背吧</div>";
+  else all.slice(0,30).forEach(d=>{
+    h += "<div style='margin-top:10px'><div style='font-size:12.5px;font-weight:700;color:var(--pink-txt)'>"+d
+      + " <span class='pill'>"+Object.keys(S.wordLog[d]).length+" 词</span></div>"
+      + "<div style='font-size:13px;color:var(--muted);margin-top:2px'>"+Object.keys(S.wordLog[d]).join(" · ")+"</div></div>";
+  });
+  h += "</div>";
+  $("v-eng").innerHTML = h;
+}
+
+/* ==================== ③④ 题库 ==================== */
+let assetLib = "基础题库";
+let xgType = "资料分析";
+const quizCtx = {};
+function renderAsset(){
+  const sub = assetLib==="基础题库"? "资产评估基础" : "资产评估相关知识";
+  const pool = QS.filter(q=>q[0]===sub);
+  const td = today(), done = S.qLog[td]||{};
+  const list = pick(pool, Math.min(10,pool.length), seedOf(td+sub));
+  const wrongN = wrongCount();
+  let h = phead("资产评估备考","📊","每日10题 · 题目自动轮换 · 错题归档","错题本 "+wrongN,"showWrong('asset')");
+  h += "<div class='tabs'>"+["基础题库","相关知识题库"].map(t=>"<button class='"+(t===assetLib?"on":"")+"' onclick=\"setAssetLib('"+t+"')\">"+t+"</button>").join("")+"</div>";
+  h += "<div class='row' style='justify-content:space-between;margin:8px 2px;font-size:12px;color:var(--muted)'>"
+    + "<span>每日自动更新 · 共 "+list.length+" 题</span><span>做题记录自动保存</span></div>";
+  h += list.map((q,i)=>qCard(q,i,"asset")).join("");
+  $("v-asset").innerHTML = h;
+}
+function setAssetLib(t){ assetLib=t; renderAsset(); }
+function renderXG(){
+  const td = today();
+  const pool = QS.filter(q=>q[0]==="行测" && q[1]===xgType);
+  const list = pick(pool, Math.min(6,pool.length), seedOf(td+xgType));
+  const wrongN = wrongCount();
+  let h = phead("国考行测学习","✏️","四大题型专项 · 每日真题自动更新","错题本 "+wrongN,"showWrong('xg')");
+  h += "<div class='tabs'>"+XGTYPE.map(t=>"<button class='"+(t===xgType?"on":"")+"' onclick=\"setXG('"+t+"')\">"+t+"</button>").join("")+"</div>";
+  h += "<div class='row' style='justify-content:space-between;margin:8px 2px;font-size:12px;color:var(--muted)'>"
+    + "<span>每日自动更新 · 共 "+list.length+" 题</span><span>做题记录自动保存</span></div>";
+  h += list.length? list.map((q,i)=>qCard(q,i,"xg")).join("") : "<div class='card'><div class='empty'>该题型暂无题目</div></div>";
+  $("v-xg").innerHTML = h;
+}
+function setXG(t){ xgType=t; renderXG(); }
+function qCard(q,i,ctx){
+  const td = today(), done = S.qLog[td]||{};
+  const id = qid(q);
+  const st = done[id];
+  const pk = done[id+"|pick"];
+  quizCtx[ctx+i] = q;
+  let h = "<div class='q'><div class='qh'><span class='no'>第"+(i+1)+"题</span><span class='pill lav'>🎯 "+esc(q[2])+"</span>"
+    + (st? "<span class='pill "+(st==="right"?"mint":"")+"'>"+(st==="right"?"已答对":"已答错")+"</span>":"")+"</div>"
+    + "<div class='stem'>"+esc(q[3])+"</div>";
+  ["A","B","C","D"].forEach((L,k)=>{
+    let cls = "";
+    if(st){ if(L===q[8]) cls = "right"; else if(st==="wrong" && pk===L) cls = "wrong"; }
+    h += "<div class='opt "+cls+"' onclick=\"answer("+i+",'"+ctx+"','"+L+"')\">"+L+". "+esc(q[4+k])+"</div>";
+  });
+  if(st) h += "<div class='exp'><b>答案 "+esc(q[8])+"</b><br>"+esc(q[9])+"</div><div class='kp'>📌 知识点："+esc(q[10])+"</div>";
+  return h+"</div>";
+}
+function answer(i, ctx, chose){
+  const q = quizCtx[ctx+i]; if(!q) return;
+  const td = today(); S.qLog[td]=S.qLog[td]||{};
+  const id = qid(q);
+  if(S.qLog[td][id]){ toast("这题已经答过啦"); return; }
+  S.qLog[td][id] = (chose===q[8])? "right":"wrong";
+  S.qLog[td][id+"|pick"] = chose;
+  save(); toast(chose===q[8]? "答对了 🎉":"再看看解析～");
+  ctx==="xg"? renderXG() : renderAsset();
+}
+function wrongCount(){
+  let n=0;
+  Object.keys(S.qLog).forEach(dt=> Object.keys(S.qLog[dt]).forEach(k=>{
+    if(k.indexOf("|pick")>0) return;
+    if(S.qLog[dt][k]==="wrong") n++;
+  }));
+  return n;
+}
+function showWrong(from){
+  const wrongs = [];
+  Object.keys(S.qLog).forEach(dt=>{
+    Object.keys(S.qLog[dt]).forEach(k=>{
+      if(k.indexOf("|pick")>0) return;
+      if(S.qLog[dt][k]!=="wrong") return;
+      const hit = QS.find(q=>qid(q)===k);
+      if(hit) wrongs.push({date:dt, q:hit});
+    });
+  });
+  let h = phead("错题本","📕","自动归档做错的题目，共 "+wrongs.length+" 题","返回", from==="xg"? "go('xg')":"go('asset')");
+  if(!wrongs.length) h += "<div class='card'><div class='empty'>还没有错题，继续保持 ✨</div></div>";
+  else{
+    h += "<div class='card'><h3><span class='ttl'>📕 全部错题</span><span class='hint'>按时间倒序</span></h3>"
+      + wrongs.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>
+        "<div style='margin-top:10px'><div style='font-size:12px;color:var(--muted)'>"+esc(x.date)+" · "+esc(x.q[0])+" · "+esc(x.q[2])+"</div>"
+        + "<div style='font-size:13.5px;font-weight:600;margin-top:2px'>"+esc(x.q[3])+"</div>"
+        + "<div class='kp'>答案 "+esc(x.q[8])+" ｜ "+esc(x.q[9])+"</div></div>").join("")
+      + "</div>";
+  }
+  $((from==="xg"?"v-xg":"v-asset")).innerHTML = h;
+}
+
+/* ==================== ⑤ 创作复盘 ==================== */
+let createTab = "选题每日灵感";
+function renderCreate(){
+  let h = phead("内容创作复盘","🎬","每日9:00灵感更新 · 赛道解析与创作思路","我的素材 "+S.ideaFav.length, "showFavIdeas()");
+  h += "<div class='tabs'>"+["选题每日灵感","爆款热点二创库","我的素材"].map(t=>"<button class='"+(t===createTab?"on":"")+"' onclick=\"setCreateTab('"+t+"')\">"+t+"</button>").join("")+"</div>";
+
+  if(createTab==="我的素材"){
+    h += "<div class='card' style='margin-top:10px'><h3><span class='ttl'>⭐ 我收藏的选题</span><span class='hint'>"+S.ideaFav.length+" 条</span></h3>"
+      + (S.ideaFav.length? S.ideaFav.map(i=>ideaCard(IDEAS[i],i,true)).join("") : "<div class='empty'>还没有收藏，去灵感里点小心心吧</div>")
+      + "</div>";
+    $("v-create").innerHTML = h; return;
+  }
+  h += "<div class='row' style='justify-content:space-between;margin:8px 2px;font-size:12px;color:var(--muted)'>"
+    + "<span>每日 9:00 自动更新灵感</span><span>今日已刷新 ✓</span></div>";
+
+  const pool = createTab==="爆款热点二创库"? IDEAS.slice(5) : IDEAS.slice(0,5);
+  h += pool.map(x=>ideaCard(x, IDEAS.indexOf(x))).join("");
+
+  h += "<div class='card'><h3><span class='ttl'>➕ 加入待办</span><span class='hint'>已加入 "+S.todoIdeas.length+" 条</span></h3>"
+    + (S.todoIdeas.length? S.todoIdeas.map((t,i)=>"<div class='kv'><span>"+esc(t)+"</span><button class='sm del' onclick='delIdeaTodo("+i+")'>删</button></div>").join("")
+        : "<div class='empty' style='padding:12px'>看到好选题点「加入待办」，会自动进入今日计划</div>")
+    + "</div>";
+  $("v-create").innerHTML = h;
+}
+function ideaCard(x, idx, simple){
+  const fav = S.ideaFav.indexOf(idx)>=0;
+  const t = String(x[0]).replace(/"/g,"").replace(/'/g,"");
+  return "<div class='idea'><div class='h'><b>"+esc(x[0])+"</b>"
+    + "<span class='fav "+(fav?"on":"")+"' onclick='favIdea("+idx+")'>"+(fav?"♥":"♡")+"</span></div>"
+    + "<div class='tags' style='margin-top:6px'><span class='pill'>💡 "+esc(x[1])+"</span></div>"
+    + "<div class='sec'><em>赛道解析：</em>"+esc(x[2])+"</div>"
+    + "<div class='sec'><em>创作思路：</em>"+esc(x[3])+"</div>"
+    + "<div class='linkbtns'>"
+    + "<a class='dy' href='https://www.douyin.com/search/"+encodeURIComponent(x[0])+"' target='_blank' rel='noopener'>🎵 抖音参考视频</a>"
+    + "<a class='bz' href='https://search.bilibili.com/all?keyword="+encodeURIComponent(x[0])+"' target='_blank' rel='noopener'>📺 B站参考视频</a>"
+    + "</div>"
+    + (simple? "" : "<div class='row' style='margin-top:9px'><button class='sm soft' onclick=\"addIdeaTodo('"+t+"')\">+ 加入待办</button></div>")
+    + "</div>";
+}
+function setCreateTab(t){ createTab=t; renderCreate(); }
+function favIdea(i){
+  const k = S.ideaFav.indexOf(i);
+  if(k>=0) S.ideaFav.splice(k,1); else S.ideaFav.push(i);
+  save(); renderCreate();
+}
+function addIdeaTodo(t){
+  if(S.todoIdeas.indexOf(t)<0) S.todoIdeas.push(t);
+  S.plans.push({id:Date.now(), title:"创作："+t, date:today(), tag:"创作复盘", done:false});
+  save(); toast("已加入今日待办"); renderAll();
+}
+function delIdeaTodo(i){ S.todoIdeas.splice(i,1); save(); renderCreate(); }
+function showFavIdeas(){ createTab="我的素材"; renderCreate(); }
+
+/* ==================== ⑥ 申论素材 ==================== */
+let slCat = "全部";
+function renderSL(){
+  const list = slCat==="全部"? MATERIALS : MATERIALS.filter(m=>m[1]===slCat);
+  const cats = ["全部"].concat(CATS);
+  let h = phead("申论写作素材","🖋️","每日更新金句 · 时评 · 分领域收纳","摘抄本 "+S.matCopy.length,"showCopy()");
+  h += "<div class='tabs'>"+cats.map(c=>"<button class='"+(c===slCat?"on":"")+"' onclick=\"setSL('"+c+"')\">"+c+"</button>").join("")+"</div>";
+  h += "<div class='row' style='justify-content:space-between;margin:8px 2px;font-size:12px;color:var(--muted)'>"
+    + "<span>每日同步最新时政素材</span><span>已收藏 "+S.matFav.length+" 条</span></div>";
+  h += list.map(m=>{
+    const gi = MATERIALS.indexOf(m);
+    const fav = S.matFav.indexOf(gi)>=0;
+    const cls = m[0]==="金句"? "" : (m[0]==="时评"? "sky":"mint");
+    return "<div class='mat'><div class='tags'><span class='pill "+cls+"'>"+esc(m[0])+"</span>"
+      + "<span class='pill lav'>"+esc(m[1])+"</span></div>"
+      + "<div class='c'>"+esc(m[2])+"</div>"
+      + "<div class='use'>🔗 "+esc(m[3])+"</div>"
+      + "<div class='acts'><button class='sm soft' onclick='copyMat("+gi+")'>📋 摘抄</button>"
+      + "<button class='sm "+(fav?"":"ghost")+"' onclick='favMat("+gi+")'>"+(fav?"已收藏 ♥":"♡ 收藏")+"</button></div></div>";
+  }).join("") || "<div class='card'><div class='empty'>该分类暂无素材</div></div>";
+  $("v-sl").innerHTML = h;
+}
+function setSL(c){ slCat=c; renderSL(); }
+
+/* ==================== 考研数学真题库 ==================== */
+function mathList(){
+  const i = S.mathSel;
+  const builtin = i===0? MATH_PAPERS.map(function(p,k){ return {key:"b"+k, year:p[0], no:p[1], type:p[2], own:false}; }) : [];
+  const mine = S.mathPapers.filter(function(p){ return p.ch===i; })
+    .map(function(p){ return {key:"u"+p.id, year:String(p.year), no:String(p.no), type:p.type, own:true, id:p.id}; });
+  let all = builtin.concat(mine);
+  if(S.mathType!=="全部") all = all.filter(function(p){ return p.type===S.mathType; });
+  all.sort(function(a,b){ return b.year.localeCompare(a.year) || (parseInt(a.no)-parseInt(b.no)); });
+  return all;
+}
+function mathAll(){
+  const i = S.mathSel;
+  const builtin = i===0? MATH_PAPERS.map(function(p,k){ return {key:"b"+k, year:p[0], no:p[1], type:p[2], own:false}; }) : [];
+  const mine = S.mathPapers.filter(function(p){ return p.ch===i; })
+    .map(function(p){ return {key:"u"+p.id, year:String(p.year), no:String(p.no), type:p.type, own:true, id:p.id}; });
+  return builtin.concat(mine);
+}
+function renderMath(){
+  const i = S.mathSel, ch = MATH_CH[i] || MATH_CH[0];
+  const list = mathList(), all = mathAll();
+  const doneN = all.filter(function(p){ return S.mathDone[p.key]; }).length;
+  const wrongN = all.filter(function(p){ return S.mathWrong[p.key]; }).length;
+  const totalWrong = Object.keys(S.mathWrong).length;
+
+  let h = phead("考研数学","📐","数一章节考点 · 历年真题 · 组合刷题", totalWrong? "错题本 "+totalWrong : "暂无错题", "showMathWrong()");
+  h += "<div class='card'><h3><span class='ttl'>📐 考研数学真题库</span><span class='hint'>当前章节 "+all.length+" 题</span></h3>";
+
+  /* 章节考点表 */
+  h += "<div class='mth'><span>章节考点</span><span>题目数量</span><span>出现年份</span><span>每年平均考察分值</span></div>";
+  h += MATH_CH.map(function(c,k){
+    return "<div class='mch "+(k===i?"on":"")+"' onclick='selMathCh("+k+")'>"
+      + "<span class='nm'>"+esc(c[0])+"</span>"
+      + "<span class='sc'>"+c[1]+"题</span>"
+      + "<span class='sc'>"+c[2]+"年</span>"
+      + "<span class='pt'><span class='pill'>"+c[3]+"分/年</span></span>"
+      + "<span class='typ'>"+esc(c[4])+"</span></div>";
+  }).join("");
+
+  /* 历年考察频率分布 */
+  const y0=1998, y1=2026, freq=[];
+  for(let y=y0;y<=y1;y++) freq.push([y, all.filter(function(p){ return p.year===String(y); }).length]);
+  const maxN = Math.max.apply(null, freq.map(function(f){ return f[1]; }).concat([1]));
+  h += "<div style='font-size:11.5px;color:var(--muted);margin:12px 0 2px'>📊 历年考察频率分布 "+y0+"-"+y1+"（当前章节）</div>";
+  h += "<div class='freq'>"+freq.map(function(f){
+    const lv = f[1]===0? "" : (f[1]===1? "h1" : (f[1]===2? "h2":"h3"));
+    const hh = 8 + Math.round(f[1]/maxN*26);
+    return "<div class='fy'><div class='bar "+lv+"' style='height:"+hh+"px'>"+(f[1]||"")+"</div><div class='yr'>"+String(f[0]).slice(2)+"</div></div>";
+  }).join("")+"</div>";
+
+  /* 题型筛选 */
+  h += "<div class='tabs' style='margin-top:10px'>"+MATH_TYPES.map(function(t){
+    return "<button class='"+(t===S.mathType?"on":"")+"' onclick=\"setMathType('"+t+"')\">"+t+"</button>";
+  }).join("")+"</div>";
+
+  /* 操作 */
+  h += "<div class='row' style='margin-top:8px'>"
+    + "<button class='soft' onclick='comboMath()'>🎲 组合刷题</button>"
+    + "<button class='ghost' onclick='openMathAdd()'>+ 添加真题</button></div>";
+  if(S.mathCombo.length){
+    h += "<div class='note' style='margin-top:8px;margin-bottom:0'>今日组合（"+S.mathCombo.length+" 题）已标记，按下方的题号顺序刷吧 💪</div>";
+  }
+
+  /* 添加表单 */
+  if(S.mathAdd){
+    h += "<div class='card' style='background:var(--p40);margin-top:10px;padding:12px'>"
+      + "<div class='frm'><div class='fld'><label class='f'>年份</label><input type='text' id='mpy' placeholder='如 2021'></div>"
+      + "<div class='fld'><label class='f'>题号</label><input type='text' id='mpn' placeholder='如 15'></div></div>"
+      + "<div class='fld' style='margin-top:8px'><label class='f'>题型</label>"
+      + "<select id='mpt'>"+MATH_TYPES.slice(1).map(function(t){ return "<option>"+t+"</option>"; }).join("")+"</select></div>"
+      + "<div class='row' style='margin-top:10px'><button onclick='saveMathPaper()'>保存到 "+esc(ch[0])+"</button>"
+      + "<button class='ghost' onclick='cancelMathAdd()'>取消</button></div></div>";
+  }
+
+  /* 真题卡片 */
+  h += "<div style='font-size:12px;color:var(--muted);margin:12px 0 2px'>真题列表 · 已做 "+doneN+" / 错题 "+wrongN+"</div>";
+  h += list.length? "<div class='papers'>"+list.map(function(p){
+    const done = !!S.mathDone[p.key], wrong = !!S.mathWrong[p.key];
+    const inCombo = S.mathCombo.indexOf(p.key)>=0;
+    return "<div class='pp "+(done?"done":"")+" "+(wrong?"wrong":"")+" "+(inCombo?"combo":"")+"'>"
+      + "<div class='yr'>"+esc(p.year)+"</div>"
+      + "<div class='no'>第"+esc(p.no)+"题</div>"
+      + "<div class='ty'>"+esc(p.type)+"</div>"
+      + "<div class='mk'><b class='"+(done?"on":"")+"' onclick='toggleMathDone(\""+p.key+"\")'>✓</b>"
+      + "<b class='wr "+(wrong?"on":"")+"' onclick='toggleMathWrong(\""+p.key+"\")'>✗</b>"
+      + (p.own? "<b onclick='delMathPaper("+p.id+")'>🗑</b>":"")+"</div></div>";
+  }).join("")+"</div>" : "<div class='empty'>这个章节还没收录真题，点「+ 添加真题」记录你刷过的卷子</div>";
+
+  h += "<div style='font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6'>"
+    + "年均分值为数一通行结构参考值，用于排复习优先级；✓ 已做 / ✗ 错题实时保存在本机。</div>";
+  h += "</div>";
+  $("v-math").innerHTML = h;
+}
+function showMathWrong(){
+  const rows = [];
+  MATH_CH.forEach(function(c,i){
+    const builtin = i===0? MATH_PAPERS.map(function(p,k){ return {key:"b"+k, year:p[0], no:p[1], type:p[2], ch:i}; }) : [];
+    const mine = S.mathPapers.filter(function(p){ return p.ch===i; })
+      .map(function(p){ return {key:"u"+p.id, year:String(p.year), no:String(p.no), type:p.type, ch:i, id:p.id}; });
+    builtin.concat(mine).forEach(function(p){ if(S.mathWrong[p.key]) rows.push({ch:c[0], year:p.year, no:p.no, type:p.type, key:p.key}); });
+  });
+  let h = phead("我的数学错题本","❌","共 "+rows.length+" 道错题","返回","go('math')");
+  h += "<div class='card'>";
+  h += rows.length? rows.map(function(r){
+    return "<div class='item'><div class='cbx on' style='background:#E8577A;border-color:#E8577A'>✗</div>"
+      + "<div class='t'><b>"+esc(r.year)+" 第"+esc(r.no)+"题</b><small>"+esc(r.ch)+" · "+esc(r.type)+"</small></div>"
+      + "<button class='sm soft' onclick=\"clearMathWrong('"+r.key+"')\">已订正</button></div>";
+  }).join("") : "<div class='empty'>还没有标记错题，去真题列表点 ✗ 记录吧</div>";
+  h += "</div>";
+  $("v-math").innerHTML = h;
+}
+function clearMathWrong(k){ delete S.mathWrong[k]; save(); showMathWrong(); toast("已订正，继续加油 💪"); }
+function selMathCh(k){ S.mathSel=k; S.mathType="全部"; S.mathCombo=[]; save(); renderMath(); }
+function setMathType(t){ S.mathType=t; renderMath(); }
+function toggleMathDone(k){
+  S.mathDone[k] = !S.mathDone[k];
+  if(!S.mathDone[k]) delete S.mathWrong[k];   /* 撤销已做时，一并清掉错题标记 */
+  save(); renderMath();
+}
+function toggleMathWrong(k){
+  S.mathWrong[k] = !S.mathWrong[k];
+  if(S.mathWrong[k]) S.mathDone[k] = true;
+  save(); renderMath();
+}
+function openMathAdd(){ S.mathAdd=true; renderMath(); }
+function cancelMathAdd(){ S.mathAdd=false; renderMath(); }
+function saveMathPaper(){
+  const y=($("mpy").value||"").trim(), n=($("mpn").value||"").trim();
+  if(!y||!n){ toast("先填年份和题号"); return; }
+  const t=$("mpt").value;
+  S.mathPapers.push({id:Date.now(), year:y, no:n, type:t, ch:S.mathSel});
+  S.mathAdd=false; save(); renderMath(); toast("已加入 "+MATH_CH[S.mathSel][0]);
+}
+function delMathPaper(id){ S.mathPapers=S.mathPapers.filter(function(p){ return p.id!==id; }); save(); renderMath(); }
+function comboMath(){
+  const list = mathList();
+  if(!list.length){ toast("这个章节还没有真题"); return; }
+  const n = Math.min(3, list.length);
+  S.mathCombo = pick(list.map(function(p){ return p.key; }), n, seedOf(today()+"-math-"+S.mathSel));
+  save(); renderMath(); toast("今日组合 "+n+" 题已生成 🎲");
+}
+function copyMat(i){
+  const m = MATERIALS[i];
+  if(S.matCopy.indexOf(i)<0) S.matCopy.push(i);
+  save();
+  const txt = m[2]+"\n——"+m[3];
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>{ toast("已复制到剪贴板"); renderMath(); }).catch(()=>{ toast("已加入摘抄本"); renderMath(); });
+  }else{ toast("已加入摘抄本"); renderMath(); }
+}
+function favMat(i){
+  const k = S.matFav.indexOf(i);
+  if(k>=0) S.matFav.splice(k,1); else S.matFav.push(i);
+  save(); renderMath();
+}
+function showCopy(){
+  let h = phead("我的摘抄本","📝","共 "+S.matCopy.length+" 条素材","返回","go('sl')");
+  h += "<div class='card'>"+(S.matCopy.length? S.matCopy.map(i=>{
+    const m = MATERIALS[i];
+    return "<div class='mat'><div class='tags'><span class='pill'>"+esc(m[0])+"</span><span class='pill lav'>"+esc(m[1])+"</span></div>"
+      + "<div class='c'>"+esc(m[2])+"</div><div class='use'>"+esc(m[3])+"</div>"
+      + "<div class='acts'><button class='sm del' onclick='unCopy("+i+")'>移出摘抄本</button></div></div>";
+  }).join("") : "<div class='empty'>还没有摘抄，去素材页点「摘抄」吧</div>")+"</div>";
+  $("v-sl").innerHTML = h;
+}
+function unCopy(i){ S.matCopy = S.matCopy.filter(x=>x!==i); save(); showCopy(); }
+
+/* ==================== 408 考研打卡 ==================== */
+function c408Flat(){
+  const out=[]; let i=0;
+  C408.forEach(function(sub){ sub[3].forEach(function(t){ out.push({i:i, sub:sub[0], txt:t, score:sub[1]}); i++; }); });
+  return out;
+}
+function c408Total(){ let n=0; C408.forEach(function(s){ n+=s[3].length; }); return n; }
+function calCells(){
+  const C=S.c408, y=C.calY, m=C.calM, td=today();
+  const first = new Date(y,m,1).getDay();
+  const days = new Date(y,m+1,0).getDate();
+  let out="";
+  for(let i=0;i<first;i++) out += "<div class='cald' style='border:none'></div>";
+  for(let d=1;d<=days;d++){
+    const ds = y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    const has = !!C.rec[ds], isTd = ds===td, sel = C.sel===ds;
+    out += "<div class='cald "+(has?"has":"")+" "+(isTd?"td":"")+" "+(sel?"sel":"")+"' onclick=\"calPick('"+ds+"')\">"+d+"</div>";
+  }
+  return out;
+}
+function calDetail(){
+  const C=S.c408, ds = C.sel || today();
+  const list = C.rec[ds]||[];
+  if(!list.length) return ds+"：当日无复习任务记录";
+  const flat = c408Flat();
+  return ds+" 复习任务：\n"+list.map(function(i){ return "• "+(flat[i]? flat[i].txt : ""); }).join("\n");
+}
+function calPick(ds){ S.c408.sel=ds; save(); renderCS408(); }
+function calMove(n){
+  const C=S.c408; let m=C.calM+n, y=C.calY;
+  if(m<0){ m=11; y--; } else if(m>11){ m=0; y++; }
+  C.calM=m; C.calY=y; save(); renderCS408();
+}
+function saveDaily408(){ S.c408.rec[today()] = S.c408.today.slice(); }
+function toggleC408(i){
+  const C=S.c408;
+  if(C.checked[i]) delete C.checked[i]; else C.checked[i]=true;
+  saveDaily408(); save(); renderCS408();
+}
+function setC408Err(i,v){
+  const C=S.c408, n=parseInt(v)||0;
+  if(n>0) C.err[i]=n; else delete C.err[i];
+  save(); renderCS408();
+}
+function setC408Num(v){
+  const n = parseInt(v)||8;
+  S.c408.num = Math.max(1, Math.min(c408Total(), n));
+  save(); renderCS408();
+}
+function randC408(){
+  const C=S.c408, total=c408Total();
+  const arr=[]; for(let i=0;i<total;i++) arr.push(i);
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+  C.today = arr.slice(0, C.num);
+  saveDaily408(); save(); renderCS408(); toast("已抽取 "+C.today.length+" 个考点");
+}
+function clearC408Today(){ S.c408.today=[]; saveDaily408(); save(); renderCS408(); toast("已清除今日标记"); }
+function resetC408(){
+  if(!confirm("确定清空全部 408 打卡、错题与日历记录？无法恢复！")) return;
+  S.c408 = blank().c408; save(); renderCS408(); toast("已重置全部 408 记录");
+}
+function exportC408(){
+  const C=S.c408, flat=c408Flat();
+  let csv = "\ufeff序号,科目,知识点名称,是否完成,错题数量,是否今日任务\n";
+  flat.forEach(function(f){
+    csv += (f.i+1)+",\""+f.sub+"\",\""+f.txt+"\","+(C.checked[f.i]?"是":"否")+","+(C.err[f.i]||0)+","+(C.today.indexOf(f.i)>=0?"是":"否")+"\n";
+  });
+  try{
+    if(appSaveText("408复习打卡记录.csv", csv)){ toast("已导出 408 打卡记录"); return; }
+    const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href=url; a.download="408复习打卡记录.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast("已导出 408 打卡记录");
+  }catch(e){ toast("导出失败，请换个浏览器试试"); }
+}
+function renderCS408(){
+  const C = S.c408, td = today();
+  const flat = c408Flat(), total = flat.length;
+  if(!C.calY){ const d=new Date(); C.calY=d.getFullYear(); C.calM=d.getMonth(); }
+  let done=0, errN=0;
+  flat.forEach(function(f){ if(C.checked[f.i]) done++; errN += (parseInt(C.err[f.i])||0); });
+  const rate = total? Math.round(done/total*100) : 0;
+
+  let h = phead("408考研","💻","数据结构 · 计组 · 操作系统 · 计算机网络","导出CSV","exportC408()");
+  h += "<div class='stats'>"
+    + "<div class='s s1'><b>"+done+"</b><span>已完成考点</span></div>"
+    + "<div class='s s2'><b>"+(total-done)+"</b><span>待复习</span></div>"
+    + "<div class='s s3'><b>"+errN+"</b><span>累计错题</span></div>"
+    + "<div class='s s4'><b>"+rate+"%</b><span>完成率</span></div>"
+    + "</div>";
+
+  h += "<div class='card'><h3><span class='ttl'>🎲 今日复习任务</span><span class='hint'>共 "+total+" 个考点 · 已抽 "+C.today.length+"</span></h3>"
+    + "<div class='row'><span style='font-size:12.5px;color:var(--muted)'>每日抽取</span>"
+    + "<input type='number' class='errin' id='c408num' value='"+C.num+"' min='1' max='"+total+"' onchange='setC408Num(this.value)'>"
+    + "<span style='font-size:12.5px;color:var(--muted)'>个考点</span>"
+    + "<button onclick='randC408()' style='padding:8px 14px'>🎲 随机生成</button></div>"
+    + "<div class='row' style='margin-top:9px'>"
+    + "<button class='soft' onclick='clearC408Today()'>清除今日标记</button>"
+    + "<button class='ghost' onclick='exportC408()'>📤 导出CSV</button>"
+    + "<button class='del' onclick='resetC408()'>⚠️ 重置全部</button></div></div>";
+
+  h += "<div class='card'><h3><span class='ttl'>📅 复习日历</span><span class='hint'>点日期看当天任务</span></h3>"
+    + "<div class='row' style='justify-content:space-between;margin-bottom:8px'>"
+    + "<button class='sm ghost' onclick='calMove(-1)'>← 上月</button>"
+    + "<b style='font-size:14px'>"+C.calY+"年"+(C.calM+1)+"月</b>"
+    + "<button class='sm ghost' onclick='calMove(1)'>下月 →</button></div>"
+    + "<div class='cal'>"+["日","一","二","三","四","五","六"].map(function(w){ return "<div class='lb'>"+w+"</div>"; }).join("")+"</div>"
+    + "<div class='cal'>"+calCells()+"</div>"
+    + "<div class='caldt'>"+esc(calDetail())+"</div></div>";
+
+  let idx=0;
+  C408.forEach(function(sub){
+    h += "<div class='card'><h3><span class='ttl'>"+sub[2]+" "+sub[0]+"</span><span class='hint'>"+sub[1]+"分 · "+sub[3].length+" 项</span></h3>";
+    sub[3].forEach(function(t){
+      const i = idx++;
+      const on = !!C.checked[i], tm = C.today.indexOf(i)>=0;
+      h += "<div class='item "+(tm?"tm":"")+"'>"
+        + "<div class='cbx "+(on?"on":"")+"' onclick='toggleC408("+i+")'>"+(on?"✓":"")+"</div>"
+        + "<div class='t'><b class='"+(on?"done":"")+"'>"+esc(t)+"</b>"+(tm? "<small>今日任务</small>":"")+"</div>"
+        + "<input type='number' class='errin' value='"+(C.err[i]||0)+"' min='0' onchange='setC408Err("+i+",this.value)' title='错题数'>"
+        + "</div>";
+    });
+    h += "</div>";
+  });
+  $("v-cs408").innerHTML = h;
+}
+
+/* ==================== 课表管理 ==================== */
+const SB_FUN = [
+  ["✏️","开启编辑","sbToggleEdit()"], ["📅","本周课程","sbThisWeek()"], ["⚙️","课表设置","sbSetPage()"],
+  ["⏱","课表时间","sbTimePage()"],     ["🧩","桌面组件","sbWidgetPage()"], ["🏫","教务导入","sbTip(\"教务导入\",\"暂不支持自动对接教务系统，可用「导入课表」手动录入或粘贴 JSON\")"],
+  ["📥","导入课表","sbImportPage()"],   ["🔗","分享课表","sbShare()"],      ["🎨","课表配色","sbThemePage()"],
+  ["🔔","课程提醒","sbNotifyPage()"],   ["🔄","调休调课","sbAdjustPage()"], ["🔢","课程序号","sbToggleNo()"],
+  ["📋","课表管理","sbManagePage()"],   ["▦","格子样式","sbToggleDense()"],["📆","课表日历","sbICS()"],
+  ["⏰","早起闹钟","sbAlarmPage()"],    ["📱","实时活动","sbTip(\"实时活动\",\"网页版暂不支持锁屏实时活动；已用「导出日历 + 课程提醒」实现同等效果\")"],
+  ["🛏","作息管理","sbRoutinePage()"],  ["❓","帮助文档","sbHelpPage()"]
+];
+function dstr(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function sbTermBase(){
+  const t=S.sb.term;
+  if(!t.start){ const n=new Date(); n.setHours(0,0,0,0); return new Date(n.getTime()-((n.getDay()+6)%7)*86400000); }
+  const d0=new Date(t.start+"T00:00:00");
+  return new Date(d0.getTime()-(((d0.getDay()+6)%7))*86400000);
+}
+function sbCurWeek(){
+  const base=sbTermBase(), n=new Date(); n.setHours(0,0,0,0);
+  return Math.floor(Math.round((n-base)/86400000)/7)+1;
+}
+function sbShowWeek(){ return Math.max(1, sbCurWeek()+ (S.sb.weekOff||0)); }
+function sbWeekDates(){
+  const start=new Date(sbTermBase().getTime()+(sbShowWeek()-1)*7*86400000);
+  const o=[]; for(let i=0;i<7;i++) o.push(new Date(start.getTime()+i*86400000));
+  return o;
+}
+function sbWeekOf(c,w){
+  if(c.week==="odd") return w%2===1;
+  if(c.week==="even") return w%2===0;
+  return true;
+}
+function sbAdjusted(c,ds){
+  const a=S.sb.adjust[ds];
+  if(!a||!a[c.id]) return c;
+  const t=a[c.id];
+  if(t.off) return null;
+  return t.to? Object.assign({},c,{day:t.to.day, s:t.to.s, e:t.to.e}) : c;
+}
+function sbDayCourses(ds,w){
+  const dow=(new Date(ds+"T00:00:00").getDay()+6)%7;
+  return S.sb.courses.filter(function(c){ return sbWeekOf(c,w); })
+    .map(function(c){ return sbAdjusted(c,ds); }).filter(Boolean)
+    .filter(function(c){ return c.day===dow; })
+    .sort(function(a,b){ return a.s-b.s; });
+}
+function sbColor(c,i){ const th=SB_THEMES[S.sb.theme]||SB_THEMES[0]; const k=(typeof c.color==="number"? c.color:0); return [th.c[k%5], th.t[k%5]]; }
+function sbMoveWeek(n){ S.sb.weekOff=(S.sb.weekOff||0)+n; save(); renderSB(); }
+function sbThisWeek(){ S.sb.weekOff=0; save(); renderSB(); toast("已回到本周"); }
+function sbToggleEdit(){ S.sb.editing=!S.sb.editing; save(); renderSB(); toast(S.sb.editing? "编辑模式已开启，点空格子加课":"已退出编辑模式"); }
+function sbToggleNo(){ S.sb.showNo=!S.sb.showNo; save(); renderSB(); }
+function sbToggleDense(){ S.sb.dense=!S.sb.dense; save(); renderSB(); toast(S.sb.dense? "已切换紧凑格子":"已切换宽松格子"); }
+function sbTip(t,m){ alert(t+"\n\n"+m); }
+function renderSB(){
+  const B=S.sb, th=SB_THEMES[B.theme]||SB_THEMES[0];
+  const w=sbShowWeek(), realW=sbCurWeek(), dates=sbWeekDates(), td=today();
+  const todayList=sbDayCourses(td, realW);
+  const weekN=dates.reduce(function(a,d){ return a+sbDayCourses(dstr(d),w).length; },0);
+
+  let hint="";
+  if(!B.term.start) hint="还没设置开学日期，点「课表设置」填写后自动计算周次";
+  else{
+    const days=Math.ceil((new Date(B.term.start+"T00:00:00")-new Date(td+"T00:00:00"))/86400000);
+    hint = days>0? ("距离 "+B.term.start+" 开学日期还剩 "+days+" 天，默认展示第一周课程")
+                 : ("第 "+w+" 周 · 共 "+(B.term.weeks||18)+" 周"+(B.weekOff? "（已切换 "+B.weekOff+" 周）":""));
+  }
+  let h=phead("课表管理","🗓️","课程 · 周次 · 提醒 · 日历联动", "导出日历","sbICS()");
+
+  h += "<div class='stats'>"
+    + "<div class='s s1'><b>"+todayList.length+"</b><span>今日课程</span></div>"
+    + "<div class='s s2'><b>"+weekN+"</b><span>本周课时</span></div>"
+    + "<div class='s s3'><b>"+B.courses.length+"</b><span>课程总数</span></div>"
+    + "<div class='s s4'><b>"+w+"</b><span>当前周次</span></div></div>";
+
+  /* 周切换 */
+  h += "<div class='card'><div class='row' style='justify-content:space-between'>"
+    + "<button class='sm ghost' onclick='sbMoveWeek(-1)'>← 上一周</button>"
+    + "<b style='font-size:14px'>第 "+w+" 周</b>"
+    + "<button class='sm ghost' onclick='sbMoveWeek(1)'>下一周 →</button></div>"
+    + "<div class='note' style='margin:9px 0 0'>"+esc(hint)+"</div></div>";
+
+  /* 今日课程卡片流（模板横向样式） */
+  h += "<div class='card'><h3><span class='ttl'>📌 今日课程</span><span class='hint'>"+td.slice(5)+"</span></h3>";
+  if(todayList.length){
+    h += "<div class='sbtoday'>";
+    todayList.forEach(function(c){
+      const col=sbColor(c);
+      h += "<div class='sbtc' style='background:"+col[0]+";color:"+col[1]+"'>"
+        + "<div class='tm'>"+(B.slots[c.s-1]? B.slots[c.s-1][1]:"")+"-"+(B.slots[c.e-1]? B.slots[c.e-1][2]:"")+"</div>"
+        + "<div class='nm'>"+esc(c.name)+"</div>"
+        + "<div class='pl'>📍 "+esc(c.place||"未填地点")+"</div></div>";
+    });
+    h += "</div>";
+  }else h += "<div class='empty'>今天没有课，安排点自己的复习吧 ✨</div>";
+  h += "</div>";
+
+  /* 本周课表网格 */
+  h += "<div class='card'><h3><span class='ttl'>📅 本周课表</span><span class='hint'>"+(B.editing? "编辑中，点空格子加课":"点课程可编辑")+"</span></h3>";
+  h += "<div class='sbwrap "+(B.dense? "dense":"")+"'><div class='sbgrid'>";
+  h += "<div class='h'></div>";
+  const names=["周一","周二","周三","周四","周五","周六","周日"];
+  dates.forEach(function(d,i){
+    const isT = dstr(d)===td;
+    h += "<div class='h "+(isT?"today":"")+"'>"+names[i]+"<br>"+(d.getMonth()+1)+"/"+d.getDate()+"</div>";
+  });
+  for(let si=0; si<B.slots.length; si++){
+    const sl=B.slots[si];
+    h += "<div class='sbslot'><b>"+(B.showNo? (si+1):(si+1))+"</b><span>"+sl[1].slice(0,5)+"</span></div>";
+    for(let dow=0; dow<7; dow++){
+      const ds=dstr(dates[dow]);
+      const list=sbDayCourses(ds,w).filter(function(c){ return c.s<=si+1 && c.e>=si+1; });
+      if(list.length){
+        const c=list[0], col=sbColor(c);
+        const isHead = c.s===si+1;
+        if(isHead){
+          h += "<div class='sbcell'><div class='sbcard' style='background:"+col[0]+";color:"+col[1]+";height:"+((c.e-c.s+1)*100)+"%' onclick='sbEditCourse(\""+c.id+"\")'>"
+            + "<div class='cn'>"+esc(c.name)+"</div>"
+            + (B.showNo? "<div class='cp'>"+(c.s)+"-"+(c.e)+"节</div>":"")
+            + "<div class='cp'>"+esc(c.place||"")+"</div></div></div>";
+        }else{
+          h += "<div class='sbcell' style='border:none;background:transparent'></div>";
+        }
+      }else{
+        h += B.editing? "<div class='sbbe' onclick='sbAddAt("+dow+","+(si+1)+")'>+</div>"
+                      : "<div class='sbcell'></div>";
+      }
+    }
+  }
+  h += "</div></div></div>";
+
+  /* 功能宫格 */
+  h += "<div class='card'><h3><span class='ttl'>🧰 课表工具</span></h3><div class='sbfun'>";
+  SB_FUN.forEach(function(f,i){
+    const col=th.c[i%5], ct=th.t[i%5];
+    h += "<button onclick='"+f[2]+"'><span class='fi' style='background:"+col+";color:"+ct+"'>"+f[0]+"</span><span>"+f[1]+"</span></button>";
+  });
+  h += "</div></div>";
+  $("v-sb").innerHTML = h;
+}
+
+/* ---- 课表：子页面 ---- */
+function sbBack(){ renderSB(); }
+function sbSetPage(){
+  const B=S.sb;
+  let h=phead("课表设置","⚙️","学期信息用于计算周次与开学倒计时","返回","sbBack()");
+  h += "<div class='card'>"
+    + "<div class='fld'><label class='f'>学期名称</label><input type='text' id='st_name' value='"+esc(B.term.name||"")+"' placeholder='如 2026-2027 学年 第一学期'></div>"
+    + "<div class='fld'><label class='f'>开学日期（第一周周一所在周）</label><input type='date' id='st_start' value='"+esc(B.term.start||"")+"'></div>"
+    + "<div class='fld'><label class='f'>学期总周数</label><input type='number' id='st_weeks' value='"+(B.term.weeks||18)+"' min='1' max='30'></div>"
+    + "<button onclick='sbSaveSet()' style='margin-top:6px'>保存设置</button></div>";
+  h += "<div class='card'><div class='note' style='margin:0'>设置开学日期后，课表会自动计算当前是第几周；往期的课也能通过「上一周」回看。</div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbSaveSet(){
+  const B=S.sb;
+  B.term.name=($("st_name").value||"").trim();
+  B.term.start=$("st_start").value||"";
+  B.term.weeks=Math.max(1, Math.min(30, parseInt($("st_weeks").value)||18));
+  save(); renderSB(); toast("设置已保存");
+}
+function sbTimePage(){
+  const B=S.sb;
+  let h=phead("课表时间","⏱","修改每节课的起止时间","返回","sbBack()");
+  h += "<div class='card'>";
+  B.slots.forEach(function(sl,i){
+    h += "<div class='sbrow'><span style='font-size:12.5px;color:var(--muted);flex:0 0 46px'>"+esc(sl[0])+"</span>"
+      + "<input type='time' class='errin' style='width:96px;flex:0 0 96px' id='ts"+i+"' value='"+esc(sl[1])+"'>"
+      + "<input type='time' class='errin' style='width:96px;flex:0 0 96px' id='te"+i+"' value='"+esc(sl[2])+"'></div>";
+  });
+  h += "<div class='row' style='margin-top:12px'><button onclick='sbSaveTime()'>保存时间</button>"
+    + "<button class='ghost' onclick='sbResetTime()'>恢复默认</button></div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbSaveTime(){
+  const B=S.sb;
+  B.slots.forEach(function(sl,i){
+    const a=$("ts"+i).value, b=$("te"+i).value;
+    if(a) sl[1]=a; if(b) sl[2]=b;
+  });
+  save(); renderSB(); toast("上课时间已更新");
+}
+function sbResetTime(){ S.sb.slots=SB_SLOTS_DEFAULT.map(function(x){ return x.slice(); }); save(); sbTimePage(); toast("已恢复默认时间表"); }
+function sbManagePage(){
+  const B=S.sb, names=["周一","周二","周三","周四","周五","周六","周日"];
+  let h=phead("课表管理","📋","共 "+B.courses.length+" 门课程 · 点卡片编辑","+ 新增课程","sbCourseForm(null)");
+  h += "<div class='card'>";
+  if(!B.courses.length) h += "<div class='empty'>还没有课程，点上面「+ 新增课程」开始录入</div>";
+  B.courses.forEach(function(c){
+    const col=sbColor(c);
+    h += "<div class='sbrow' onclick='sbEditCourse(\""+c.id+"\")'>"
+      + "<span style='width:34px;height:34px;border-radius:11px;flex:0 0 34px;background:"+col[0]+";color:"+col[1]+";display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700'>"+esc(c.name.slice(0,2))+"</span>"
+      + "<span class='tt'><b>"+esc(c.name)+"</b><small>"+esc(names[c.day]||"")+" "+c.s+"-"+c.e+"节 · "+esc(c.place||"未填地点")+" · "+({all:"每周",odd:"单周",even:"双周"}[c.week]||"每周")+"</small></span>"
+      + "<button class='sm del' onclick='event.stopPropagation();sbDelCourse(\""+c.id+"\")'>删</button></div>";
+  });
+  h += "</div>";
+  $("v-sb").innerHTML=h;
+}
+function sbEditCourse(id){
+  const c=S.sb.courses.find(function(x){ return String(x.id)===String(id); });
+  if(!c){ toast("课程不存在"); return; }
+  sbCourseForm(c);
+}
+function sbCourseForm(c){
+  const B=S.sb, names=["周一","周二","周三","周四","周五","周六","周日"];
+  B._editId = c? c.id : null;
+  B._pickColor = c? (c.color||0) : 0;
+  let h=phead(c? "编辑课程":"添加课程","📝", c? c.name:"填写课程信息","返回","sbBack()");
+  h += "<div class='card'>"
+    + "<div class='fld'><label class='f'>课程名称</label><input type='text' id='cf_name' value='"+esc(c?c.name:"")+"' placeholder='如 高等数学'></div>"
+    + "<div class='frm'><div class='fld'><label class='f'>任课老师（选填）</label><input type='text' id='cf_teacher' value='"+esc(c&&c.teacher?c.teacher:"")+"'></div>"
+    + "<div class='fld'><label class='f'>上课地点</label><input type='text' id='cf_place' value='"+esc(c&&c.place?c.place:"")+"' placeholder='如 1-401'></div></div>"
+    + "<div class='frm'><div class='fld'><label class='f'>星期</label><select id='cf_day'>"
+    + names.map(function(n,i){ return "<option value='"+i+"'"+(c&&c.day===i?" selected":"")+">"+n+"</option>"; }).join("")+"</select></div>"
+    + "<div class='fld'><label class='f'>周次</label><select id='cf_week'>"
+    + ["all","odd","even"].map(function(k,i){ const t=["每周","单周","双周"][i]; return "<option value='"+k+"'"+(c&&c.week===k?" selected":"")+">"+t+"</option>"; }).join("")+"</select></div></div>"
+    + "<div class='frm'><div class='fld'><label class='f'>开始节次</label><select id='cf_s'>"
+    + B.slots.map(function(sl,i){ return "<option value='"+(i+1)+"'"+(c&&c.s===i+1?" selected":"")+">"+esc(sl[0])+"</option>"; }).join("")+"</select></div>"
+    + "<div class='fld'><label class='f'>结束节次</label><select id='cf_e'>"
+    + B.slots.map(function(sl,i){ return "<option value='"+(i+1)+"'"+(c&&c.e===i+1?" selected":"")+">"+esc(sl[0])+"</option>"; }).join("")+"</select></div></div>"
+    + "<div class='fld'><label class='f'>格子颜色</label><div class='sbsw' id='cf_color'>"
+    + SB_THEMES[B.theme].c.map(function(col,i){ const on=(B._pickColor===i); return "<b style='background:"+col+"' class='"+(on?"on":"")+"' onclick='sbPickColor("+i+")'>"+(on?"✓":"")+"</b>"; }).join("")
+    + "</div></div>"
+    + "<div class='row' style='margin-top:12px'><button onclick='sbSaveCourse()'>保存</button>"
+    + (c? "<button class='del' onclick='sbDelCourse(\""+c.id+"\")'>删除</button>":"")
+    + "<button class='ghost' onclick='sbBack()'>取消</button></div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbPickColor(i){
+  S.sb._pickColor=i;
+  const box=document.getElementById("cf_color");
+  if(box) Array.from(box.children).forEach(function(b,k){ b.className=(k===i?"on":""); b.textContent=(k===i?"✓":""); });
+}
+function sbSaveCourse(){
+  const B=S.sb;
+  const name=($("cf_name").value||"").trim();
+  if(!name){ toast("填一下课程名称"); return; }
+  let sN=parseInt($("cf_s").value), eN=parseInt($("cf_e").value);
+  if(eN<sN) eN=sN;
+  const o={name:name, teacher:($("cf_teacher").value||"").trim(), place:($("cf_place").value||"").trim(),
+           day:parseInt($("cf_day").value), week:$("cf_week").value, s:sN, e:eN,
+           color:(typeof B._pickColor==="number"? B._pickColor:0)};
+  if(B._editId){
+    const c=B.courses.find(function(x){ return String(x.id)===String(B._editId); });
+    if(c) Object.assign(c,o);
+    toast("已保存修改");
+  }else{ o.id=Date.now(); B.courses.push(o); toast("已添加课程"); }
+  B._editId=null; B._pickColor=undefined;
+  save(); renderSB();
+}
+function sbDelCourse(id){
+  if(!confirm("确定删除这门课？")) return;
+  S.sb.courses=S.sb.courses.filter(function(x){ return String(x.id)!==String(id); });
+  save(); sbManagePage(); toast("已删除");
+}
+function sbAddAt(dow, no){
+  const B=S.sb;
+  const c={id:Date.now(), name:"", teacher:"", place:"", day:dow, s:no, e:no, week:"all", color:B.courses.length%5};
+  B._addAt=c;
+  sbCourseForm(null);
+  const dsel=document.getElementById("cf_day");
+  if(dsel) dsel.value=String(dow);
+  const ss=document.getElementById("cf_s"); if(ss) ss.value=String(no);
+  const se=document.getElementById("cf_e"); if(se) se.value=String(no);
+}
+function sbThemePage(){
+  const B=S.sb;
+  let h=phead("课表配色","🎨","选一套顺眼的马卡龙配色","返回","sbBack()");
+  h += "<div class='card'>";
+  SB_THEMES.forEach(function(t,i){
+    h += "<div class='sbrow' onclick='sbSetTheme("+i+")'>"
+      + "<span style='display:flex;gap:3px;flex:0 0 auto'>"+t.c.map(function(c){ return "<b style='width:18px;height:18px;border-radius:6px;background:"+c+"'></b>"; }).join("")+"</span>"
+      + "<span class='tt'><b>"+esc(t.name)+"</b></span>"
+      + (B.theme===i? "<span class='pill'>使用中</span>":"")+"</div>";
+  });
+  h += "</div>";
+  $("v-sb").innerHTML=h;
+}
+function sbSetTheme(i){ S.sb.theme=i; save(); sbThemePage(); toast("配色已更新"); }
+function sbNotifyPage(){
+  const B=S.sb;
+  const granted = (typeof Notification!=="undefined" && Notification.permission==="granted");
+  let h=phead("课程提醒","🔔","上课前自动提醒 · 联动手机日历","返回","sbBack()");
+  h += "<div class='card'>"
+    + "<div class='sbrow'><span class='tt'><b>开启上课提醒</b><small>页面打开时，课前会弹通知</small></span>"
+    + "<button class='sm "+(B.notify?"":"ghost")+"' onclick='sbToggleNotify()'>"+(B.notify?"已开启":"点此开启")+"</button></div>"
+    + "<div class='fld' style='margin-top:10px'><label class='f'>提前提醒（分钟）</label>"
+    + "<input type='number' class='errin' id='nf_min' value='"+(B.remind||10)+"' min='1' max='60' onchange='sbSetRemind(this.value)'></div>"
+    + "<div class='row' style='margin-top:10px'><button class='soft' onclick='sbReqNotify()'>申请通知权限</button>"
+    + "<button class='ghost' onclick='sbTestNotify()'>发一条测试提醒</button></div>"
+    + "<div class='note' style='margin:10px 0 0'>当前权限：<b>"+(granted? "已授权 ✅":"未授权")+"</b>。"
+    + (granted? "":" 未授权时只会在页面内弹提示条。")+"<br>想要更稳的「闹钟」效果，用右上「导出日历」把课表导进手机日历。</div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbToggleNotify(){
+  const B=S.sb;
+  B.notify=!B.notify;
+  save();
+  if(B.notify && typeof Notification!=="undefined" && Notification.permission==="default") sbReqNotify();
+  sbNotifyPage();
+}
+function sbSetRemind(v){ S.sb.remind=Math.max(1,Math.min(60,parseInt(v)||10)); save(); toast("提前 "+S.sb.remind+" 分钟提醒"); }
+function sbReqNotify(){
+  if(typeof Notification==="undefined"){ toast("这个浏览器不支持通知"); return; }
+  Notification.requestPermission().then(function(p){
+    toast(p==="granted"? "通知权限已开启 ✅":"未授权，页面内仍会提醒");
+    sbNotifyPage();
+  }).catch(function(){ toast("申请失败，请检查浏览器设置"); });
+}
+function sbFire(title, body){
+  try{
+    if(typeof Notification!=="undefined" && Notification.permission==="granted") new Notification(title,{body:body});
+  }catch(e){}
+  toast(title+" · "+body);
+}
+function sbTestNotify(){ sbFire("🔔 测试提醒","这是来自一凡工作台的通知，设置成功啦"); }
+function sbAlarmPage(){
+  const B=S.sb;
+  let h=phead("早起闹钟","⏰","到点提醒起床 · 配合作息管理","返回","sbBack()");
+  h += "<div class='card'>"
+    + "<div class='sbrow'><span class='tt'><b>开启早起闹钟</b><small>每天固定时间提醒起床</small></span>"
+    + "<button class='sm "+(B.alarmOn?"":"ghost")+"' onclick='sbToggleAlarm()'>"+(B.alarmOn?"已开启":"点此开启")+"</button></div>"
+    + "<div class='fld' style='margin-top:10px'><label class='f'>闹钟时间</label>"
+    + "<input type='time' class='errin' style='width:120px' id='al_t' value='"+esc(B.alarm||"07:00")+"' onchange='sbSetAlarm(this.value)'></div>"
+    + "<div class='note' style='margin:10px 0 0'>注意：网页闹钟需要页面在后台开着才响。要「真闹钟」效果，请选择<b>导出日历</b>——系统日历事件的提醒由手机系统负责，锁屏也会响。</div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbToggleAlarm(){ S.sb.alarmOn=!S.sb.alarmOn; save(); sbAlarmPage(); toast(S.sb.alarmOn? "早起闹钟已开启":"已关闭"); }
+function sbSetAlarm(v){ S.sb.alarm=v||"07:00"; save(); toast("闹钟设为 "+S.sb.alarm); }
+function sbRoutinePage(){
+  const B=S.sb;
+  let h=phead("作息管理","🛏","安排起床、午休、晚自习时间","+ 添加","sbAddRoutine()");
+  h += "<div class='card'>";
+  if(!B.routine.length) h += "<div class='empty'>还没有作息安排</div>";
+  B.routine.slice().sort(function(a,b){ return a.time.localeCompare(b.time); }).forEach(function(r){
+    h += "<div class='sbrow'><span style='font-size:13px;font-weight:700;color:var(--pink-txt);flex:0 0 48px'>"+esc(r.time)+"</span>"
+      + "<span class='tt'><b>"+esc(r.title)+"</b></span>"
+      + "<button class='sm del' onclick='sbDelRoutine(\""+r.id+"\")'>删</button></div>";
+  });
+  h += "</div>";
+  h += "<div class='card'><div class='frm'><div class='fld'><label class='f'>时间</label><input type='time' id='rt_time'></div>"
+    + "<div class='fld'><label class='f'>安排</label><input type='text' id='rt_title' placeholder='如 晚自习 · 408 刷题'></div></div>"
+    + "<button onclick='sbSaveRoutine()' style='margin-top:6px'>添加到作息表</button></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbAddRoutine(){ const t=$("rt_time").value, ti=($("rt_title").value||"").trim(); if(!t||!ti){ toast("填时间和安排"); return; }
+  S.sb.routine.push({id:Date.now(), time:t, title:ti}); save(); sbRoutinePage(); toast("已加入作息表"); }
+function sbSaveRoutine(){ sbAddRoutine(); }
+function sbDelRoutine(id){ S.sb.routine=S.sb.routine.filter(function(x){ return String(x.id)!==String(id); }); save(); sbRoutinePage(); }
+function sbWidgetPage(){
+  let h=phead("桌面组件","🧩","把课表加到手机桌面","返回","sbBack()");
+  h += "<div class='card'><div style='font-size:13.5px;line-height:1.9'>"
+    + "<b>安卓：</b>用浏览器打开本页 → 右上角 ⋮ →「添加到主屏幕 / 安装应用」<br>"
+    + "<b>苹果：</b>用 <b>Safari</b> 打开 → 底部分享按钮 ⬆️ →「添加到主屏幕」<br><br>"
+    + "添加后桌面会出现「一凡工作台」图标，点开就是全屏的课表，跟 App 一样。<br>"
+    + "想在桌面直接看到今天有什么课，可以把「今日课程」那张卡片截图设为桌面小组件（安卓支持）。"
+    + "</div></div>";
+  $("v-sb").innerHTML=h;
+}
+
+/* ---- 课表：调休 / 导入 / 分享 / 帮助 ---- */
+function sbAdjustPage(){
+  const B=S.sb, names=["周一","周二","周三","周四","周五","周六","周日"];
+  const ds = B._adjDate || today();
+  B._adjDate = ds;
+  const list = B.courses.filter(function(c){ return (c.day===((new Date(ds+"T00:00:00").getDay()+6)%7)) && sbWeekOf(c, sbShowWeek()); });
+  let h=phead("调休调课","🔄","临时停课或调整某天的课程","返回","sbBack()");
+  h += "<div class='card'><div class='fld'><label class='f'>选择日期</label>"
+    + "<input type='date' id='aj_d' value='"+esc(ds)+"' onchange='sbAdjDate(this.value)'></div>";
+  if(!list.length) h += "<div class='empty'>这一天没有课，换个日期试试</div>";
+  list.forEach(function(c){
+    const st=B.adjust[ds] && B.adjust[ds][c.id];
+    const col=sbColor(c);
+    h += "<div class='sbrow'><span style='width:30px;height:30px;border-radius:9px;flex:0 0 30px;background:"+col[0]+"'></span>"
+      + "<span class='tt'><b>"+esc(c.name)+"</b><small>"+esc(names[c.day])+" "+c.s+"-"+c.e+"节 · "+esc(c.place||"")+"</small></span>"
+      + (st&&st.off? "<span class='pill'>已停课</span>" : (st&&st.to? "<span class='pill lav'>已调至"+names[st.to.day]+st.to.s+"节</span>":""))
+      + "<button class='sm "+(st&&st.off?"":"ghost")+"' onclick='sbAdjOff(\""+c.id+"\")'>停课</button>"
+      + "<button class='sm soft' onclick='sbAdjMove(\""+c.id+"\")'>调课</button></div>";
+  });
+  if(Object.keys(B.adjust).length){
+    h += "<div class='row' style='margin-top:10px'><button class='del' onclick='sbAdjClear()'>清空全部调休记录</button></div>";
+  }
+  h += "</div>";
+  $("v-sb").innerHTML=h;
+}
+function sbAdjDate(v){ S.sb._adjDate=v; renderSub(function(){ sbAdjustPage(); }); }
+function sbAdjOff(id){
+  const B=S.sb, ds=B._adjDate||today();
+  B.adjust[ds]=B.adjust[ds]||{};
+  const cur=B.adjust[ds][id];
+  if(cur&&cur.off) delete B.adjust[ds][id]; else B.adjust[ds][id]={off:true};
+  save(); sbAdjustPage(); toast("已更新");
+}
+function sbAdjMove(id){
+  const B=S.sb, ds=B._adjDate||today(), names=["周一","周二","周三","周四","周五","周六","周日"];
+  const c=B.courses.find(function(x){ return String(x.id)===String(id); });
+  if(!c) return;
+  const day=prompt("调到星期几？\n0=周一 1=周二 2=周三 3=周四 4=周五 5=周六 6=周日", String(c.day));
+  if(day===null) return;
+  const s=prompt("从第几节开始？（1-"+B.slots.length+"）", String(c.s));
+  if(s===null) return;
+  const d=parseInt(day), sn=parseInt(s);
+  if(isNaN(d)||d<0||d>6||isNaN(sn)||sn<1||sn>B.slots.length){ toast("输入不合法"); return; }
+  B.adjust[ds]=B.adjust[ds]||{};
+  B.adjust[ds][id]={to:{day:d, s:sn, e:sn+(c.e-c.s)}};
+  save(); sbAdjustPage(); toast("已调至"+names[d]+"第"+sn+"节");
+}
+function sbAdjClear(){ if(!confirm("清空所有调休调课记录？")) return; S.sb.adjust={}; save(); sbAdjustPage(); toast("已清空"); }
+function renderSub(fn){ fn(); }
+function sbImportPage(){
+  let h=phead("导入课表","📥","图片识别 / JSON 导入","返回","sbBack()");
+  /* 图片识别一键导入 */
+  h += "<div class='card'><h3><span class='ttl'>📷 图片识别一键导入</span><span class='hint'>推荐</span></h3>"
+    + "<div style='font-size:12.5px;color:var(--muted);line-height:1.75;margin-bottom:11px'>"
+    + "上传课表<b>截图</b>或拍照，自动认出课程名、星期、节次和地点，识别完进编辑页核对 → 一键导入。<br>"
+    + "支持的图片：教务系统课表、<b>超级课程表 / 课程格子</b>等 App 截图、班级群发的课表。</div>"
+    + "<div class='row'>"
+    + "<button onclick=\"$('sbImg').click()\">🖼️ 选择图片</button>"
+    + "<button class='soft' onclick=\"$('sbCam').click()\">📸 拍照导入</button></div>"
+    + "<input type='file' id='sbImg' accept='image/*' style='display:none' onchange='sbPickImg(this)'>"
+    + "<input type='file' id='sbCam' accept='image/*' capture='environment' style='display:none' onchange='sbPickImg(this)'>"
+    + "<div class='note' style='margin:11px 0 0'>图片只在<b>本机</b>处理，不会上传服务器。首次识别需联网下载识别包（约 15MB），之后会缓存。</div></div>";
+  /* JSON 导入 */
+  h += "<div class='card'><h3><span class='ttl'>📥 JSON 导入 / 备份</span></h3>"
+    + "<div class='fld'><label class='f'>粘贴课表 JSON（从「分享课表」导出得到）</label>"
+    + "<textarea id='im_json' rows='7' placeholder='{\"courses\":[...]}'></textarea></div>"
+    + "<div class='row'><button onclick='sbDoImport()'>导入</button>"
+    + "<button class='soft' onclick='sbExportJson()'>导出当前课表(JSON)</button></div>"
+    + "<div class='note' style='margin:10px 0 0'>JSON 导入会<b>覆盖</b>现有课程，建议先导出备份；图片识别则是<b>追加</b>。</div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbPickImg(inp){
+  const f=inp.files && inp.files[0];
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("请选择图片文件"); inp.value=""; return; }
+  if(f.size > 12*1024*1024){ toast("图片太大了，换一张小一点的"); inp.value=""; return; }
+  inp.value="";
+  sbOCRPage(f);
+}
+function sbDoImport(){
+  const raw=($("im_json").value||"").trim();
+  if(!raw){ toast("先粘贴内容"); return; }
+  try{
+    const o=JSON.parse(raw);
+    if(!o.courses || !Array.isArray(o.courses)) throw new Error("缺少 courses 字段");
+    S.sb.courses = o.courses.map(function(c){
+      return {id:c.id||Date.now()+Math.random(), name:String(c.name||"未命名"), teacher:c.teacher||"", place:c.place||"",
+              day:Math.max(0,Math.min(6,parseInt(c.day)||0)), s:Math.max(1,parseInt(c.s)||1), e:Math.max(1,parseInt(c.e)||1),
+              week:["all","odd","even"].indexOf(c.week)>=0? c.week:"all", color:parseInt(c.color)||0};
+    });
+    if(o.term) S.sb.term=Object.assign(S.sb.term, o.term);
+    if(Array.isArray(o.slots)&&o.slots.length) S.sb.slots=o.slots;
+    save(); renderSB(); toast("已导入 "+S.sb.courses.length+" 门课");
+  }catch(e){ toast("导入失败："+e.message); }
+}
+function sbExportJson(){
+  const data={ver:1, term:S.sb.term, slots:S.sb.slots, courses:S.sb.courses};
+  sbDownload(JSON.stringify(data,null,2), "我的课表备份.json", "application/json");
+  toast("备份已导出");
+}
+function sbShare(){
+  const B=S.sb, names=["周一","周二","周三","周四","周五","周六","周日"], w=sbShowWeek();
+  let txt="我的课表（第"+w+"周）\n";
+  if(B.term.name) txt+="学期："+B.term.name+"\n";
+  txt+="\n";
+  B.courses.slice().sort(function(a,b){ return a.day-b.day || a.s-b.s; }).forEach(function(c){
+    txt += names[c.day]+" "+c.s+"-"+c.e+"节  "+c.name+(c.place? " @"+c.place:"")+"  "+({all:"每周",odd:"单周",even:"双周"}[c.week]||"每周")+"\n";
+  });
+  txt += "\n—— 来自一凡工作台";
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ toast("课表已复制，可直接粘贴到微信/备忘录"); })
+      .catch(function(){ sbDownload(txt,"我的课表.txt","text/plain"); });
+  }else sbDownload(txt,"我的课表.txt","text/plain");
+}
+function sbHelpPage(){
+  let h=phead("帮助文档","❓","课表怎么用，看这一页就够","返回","sbBack()");
+  h += "<div class='card'><div style='font-size:13.5px;line-height:1.95'>"
+    + "<b>1. 录入课程（三种方式）</b><br>"
+    + "① <b>图片识别</b>（最快）：「导入课表 → 选择图片」，上传教务系统课表或超级课程表等 App 的<b>周课表网格截图</b>，自动认出课程名、星期、节次、地点，核对后一键导入。<br>"
+    + "② 点「开启编辑」再点空格子；<br>"
+    + "③ 进「课表管理 → + 新增课程」手动填写。支持单周/双周课。<br><br>"
+    + "<b>1.1 识别不准怎么办</b><br>结果页每门课都能单独改：名称、地点、星期、开始/结束节次都能改，多余的可以「删除这条」。识别依赖图片清晰度，尽量用网点正的截图；图片只在本机处理。<br><br>"
+    + "<b>2. 设置学期</b><br>进「课表设置」填开学日期，会自动算出当前第几周、离开学还有几天。<br><br>"
+    + "<b>3. 改上课时间</b><br>「课表时间」里可以逐节修改起止时间，改完点保存。<br><br>"
+    + "<b>4. 临时调休停课</b><br>「调休调课」选日期，对当天课程点「停课」或「调课」，不影响原课表。<br><br>"
+    + "<b>5. 手机闹钟 / 日历联动</b><br>"
+    + "① <b>导出日历</b>（推荐）：生成 .ics 文件，打开后自动进手机日历，每节课都带「课前提醒」，由系统负责响铃，锁屏也会提醒。<br>"
+    + "② <b>课程提醒</b>：开启并授权通知，页面开着时课前会弹提醒。<br>"
+    + "③ <b>早起闹钟</b>：设定时间，到点提醒起床。<br><br>"
+    + "<b>6. 数据保存</b><br>所有内容实时存在本机浏览器里。建议定期用「分享课表 → 导出JSON」备份。<br><br>"
+    + "<b>注意</b>：换手机或清理浏览器数据会丢失，请先导出备份。"
+    + "</div></div>";
+  $("v-sb").innerHTML=h;
+}
+/* 统一保存出口：在打包的 APK 里交给原生存到「下载」目录，网页里用 blob 下载 */
+function appSaveText(filename, text){
+  try{
+    if(window.YifanApp && typeof window.YifanApp.saveText==="function"){
+      window.YifanApp.saveText(filename, text);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+function sbDownload(text, filename, type){
+  try{
+    if(appSaveText(filename, text)) return;
+    const blob=new Blob([text],{type:(type||"text/plain")+";charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+  }catch(e){ toast("下载失败，请换个浏览器"); }
+}
+
+/* ============ 图片识别一键导入课表 ============ */
+const SB_DAY_WORDS = ["周一","周二","周三","周四","周五","周六","周日","星期一","星期二","星期三","星期四","星期五","星期六","星期日","一","二","三","四","五","六","日"];
+function sbLoadOCR(cb){
+  if(typeof Tesseract!=="undefined"){ cb(true); return; }
+  const urls=["https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",
+              "https://unpkg.com/tesseract.js@5.1.1/dist/tesseract.min.js",
+              "https://cdn.staticfile.org/tesseract.js/5.1.1/tesseract.min.js"];
+  (function next(i){
+    if(i>=urls.length){ cb(false); return; }
+    const sc=document.createElement("script");
+    sc.src=urls[i];
+    sc.onload=function(){ cb(typeof Tesseract!=="undefined"); };
+    sc.onerror=function(){ sc.remove(); next(i+1); };
+    document.head.appendChild(sc);
+  })(0);
+}
+/* OCR 出来的词按坐标还原成星期×节次的网格（纯函数，便于测试） */
+function sbIsDayWord(t){ return SB_DAY_WORDS.indexOf(String(t||"").trim())>=0; }
+function sbParseWords(words){
+  const out=[], info={header:false, rows:0, cols:0, secs:0};
+  if(!words || !words.length) return out;
+  const W=[];
+  words.forEach(function(w){
+    const t=String(w.text||"").trim();
+    if(!t) return;
+    const x=+w.x||0, y=+w.y||0, ww=+w.w||10, hh=+w.h||16;
+    W.push({text:t, x:x, y:y, w:ww, h:hh, cx:x+ww/2, cy:y+hh/2});
+  });
+  if(!W.length) return out;
+  const avgH=W.reduce(function(a,w){ return a+w.h; },0)/W.length;
+  const med=function(arr){ if(!arr.length) return 0; const a=arr.slice().sort(function(p,q){return p-q;}); return a[Math.floor(a.length/2)]; };
+
+  /* 1. 找星期表头 → 列中心（优先 “周一” 这类双字，避免单字误判） */
+  function buildCols(cands){
+    if(cands.length<3) return null;
+    cands.sort(function(a,b){ return a.cy-b.cy; });
+    let best=[], cur=[cands[0]];
+    for(let i=1;i<cands.length;i++){
+      if(Math.abs(cands[i].cy-cur[0].cy)<=Math.max(avgH*0.9,12)) cur.push(cands[i]);
+      else { if(cur.length>best.length) best=cur; cur=[cands[i]]; }
+    }
+    if(cur.length>best.length) best=cur;
+    if(best.length<3) return null;
+    const mp={};
+    best.forEach(function(w){
+      const d=SB_DAY_WORDS.indexOf(w.text)%7;
+      if(!(d in mp)) mp[d]=w;
+    });
+    const ks=Object.keys(mp);
+    if(ks.length<3) return null;
+    return ks.map(function(k){ return {day:parseInt(k), cx:mp[k].cx}; }).sort(function(a,b){ return a.cx-b.cx; });
+  }
+  let cols=buildCols(W.filter(function(w){ const i=SB_DAY_WORDS.indexOf(w.text); return i>=0 && i<14; }));
+  if(!cols) cols=buildCols(W.filter(function(w){ const i=SB_DAY_WORDS.indexOf(w.text); return i>=14; }));
+
+  let gap=100, gridLeft=1e9;
+  if(cols && cols.length){
+    info.header=true; info.cols=cols.length;
+    const gs=[];
+    for(let i=1;i<cols.length;i++) gs.push(cols[i].cx-cols[i-1].cx);
+    const g=med(gs);
+    gap = g || (cols.length>1? (cols[cols.length-1].cx-cols[0].cx)/(cols.length-1) : 120);
+    gridLeft = cols[0].cx - gap*0.6;
+  }
+
+  /* 2. 找左侧节次标记（第N节 / N / N-M节 / 08:00） */
+  const anchorsAll=W.filter(function(w){ return w.cx < gridLeft; });
+  const anchors=[];
+  anchorsAll.forEach(function(w){
+    const t=w.text.replace(/\s/g,"");
+    let m=t.match(/^第?\s*(\d{1,2})\s*[-~—]\s*(\d{1,2})\s*节?$/) || t.match(/^第?\s*(\d{1,2})\s*节$/);
+    if(m){ anchors.push({cy:w.cy, n:parseInt(m[1]), kind:"sec"}); return; }
+    if(/^\d{1,2}$/.test(t)){ anchors.push({cy:w.cy, n:parseInt(t), kind:"num"}); return; }
+    if(/^\d{1,2}[:：]\d{2}$/.test(t)){ anchors.push({cy:w.cy, n:-1, kind:"time"}); return; }
+  });
+  anchors.sort(function(a,b){ return a.cy-b.cy; });
+  const hasNum=anchors.some(function(a){ return a.kind!=="time"; });
+  const anchorsUse=anchors.filter(function(a){ return hasNum? a.kind!=="time" : true; });
+  anchorsUse.forEach(function(a,i){ if(a.kind==="time") a.n=i+1; });
+  const gapsA=[];
+  for(let i=1;i<anchorsUse.length;i++) gapsA.push(anchorsUse[i].cy-anchorsUse[i-1].cy);
+  const gapA=med(gapsA)||avgH*2;
+  info.secs=anchorsUse.length;
+
+  /* 3. 剩余文字聚成行（跳过表头行） */
+  const SB_JUNK_TEXT=/(开学日期|还剩|默认展示|期待分享|上线了|今日课程|明日课程|周次|添加课程|点击|长按|登录|注册|我的|日程|订阅|广告|更新|客服)/;
+  const SB_UI_NOISE=/^(上一周|下一周|本周|本周课程|第?\d{1,2}周|课表\S*|设置|时间|管理|桌面组件|教务导入|导入课表|分享课表|配色|课程提醒|调休调课|课程序号|格子样式|日历|早起闹钟|实时活动|作息管理|帮助文档|开启编辑|桌面|编辑|添加|搜索|更多|返回|完成|取消|确定|小程序|微信|安卓|版本|上线|课表|日程|我的|主页|发现|消息)$/;
+  const body=W.filter(function(w){
+    if(cols && cols.length && w.cx<gridLeft) return false;
+    if(cols && cols.length){
+      const hd=W.some(function(o){ return Math.abs(o.cy-w.cy)<=Math.max(avgH*0.9,12) && SB_DAY_WORDS.indexOf(o.text)>=0 && Math.abs(o.cx-cols[0].cx)<gap*0.5; });
+      return !hd;
+    }
+    return true;
+  });
+  const rows=[];
+  body.slice().sort(function(a,b){ return a.cy-b.cy; }).forEach(function(w){
+    let tg=null;
+    for(let i=0;i<rows.length;i++){ if(Math.abs(w.cy-rows[i].cy) <= Math.max(avgH*0.8,10)){ tg=rows[i]; break; } }
+    if(tg){ tg.items.push(w); tg.top=Math.min(tg.top,w.y); tg.cy=(tg.cy*tg.items.length+(w.cy-tg.cy))/tg.items.length; }
+    else rows.push({cy:w.cy, top:w.y, items:[w]});
+  });
+  rows.forEach(function(r){ r.items.sort(function(a,b){ return a.cx-b.cx; }); });
+  info.rows=rows.length;
+
+  const noiseRowItems=function(items){
+    if(!items || !items.length) return true;
+    let ui=0, real=0;
+    items.forEach(function(w){
+      const t=String(w.text||"").replace(/\s/g,"");
+      if(SB_UI_NOISE.test(t)) ui++;
+      else if(/[\u4e00-\u9fa5]{2,}/.test(t) || /^[\u4e00-\u9fa5]{0,6}(?:楼|操场|场馆|实验室|机房|教室|报告厅)/.test(t)) real++;
+    });
+    if(real===0) return true;                                    // 状态栏 / 图标行
+    if(items.length>=3 && ui>=Math.ceil(items.length*0.6)) return true;  // 整行都是功能按钮
+    if(ui>0 && ui===items.length) return true;
+    return false;
+  };
+  const isJunkText=function(t){
+    if(SB_JUNK_TEXT.test(t)) return true;
+    if(/[\u4e00-\u9fa5]/.test(t) && t.replace(/[\u4e00-\u9fa5]/g,"").length>t.length*0.55) return true;  // 符号多于汉字
+    return t.length>42;
+  };
+  /* 兜底：没有网格/节次 → 按行罗列，自动认星期、过滤界面按钮字 */
+  const rowList=function(){
+    const res=[];
+    let day=null;
+    rows.forEach(function(r){
+      if(noiseRowItems(r.items)) return;
+      let items=r.items.slice();
+      const leads=items.filter(function(w){ return SB_DAY_WORDS.indexOf(w.text)>=0; });
+      if(leads.length===1 && leads[0].cx-items[0].cx<gap*0.35){
+        day=SB_DAY_WORDS.indexOf(leads[0].text)%7;
+        items=items.filter(function(w){ return SB_DAY_WORDS.indexOf(w.text)<0; });
+      }
+      if(!items.length) return;
+      let t=items.map(function(w){ return w.text; }).join(" ").replace(/\s+/g," ").trim();
+      t=t.replace(/^\d{1,2}[:：]\d{2}\s+/, "").trim();     // 去掉行首的时间
+      if(!t || isJunkText(t)) return;
+      const np=sbSplitNamePlace(t);
+      res.push({name:np[0], place:np[1], day:(day===null?0:day), sec:1, span:1, raw:t});
+    });
+    return res;
+  };
+  if(!cols || !cols.length || !anchorsUse.length) return rowList();
+
+  /* 4. 行 → 第几节；行内字 → 星期列 */
+  const cells={};
+  rows.forEach(function(r){
+    let best=null, bd=1e9;
+    anchorsUse.forEach(function(a){
+      const d=Math.abs(a.cy-r.cy);
+      if(d<bd){ bd=d; best=a; }
+    });
+    if(!best || bd>gapA*0.9) return;
+    if(!best.n || best.n<1) return;
+    r.items.forEach(function(w){
+      const t=w.text;
+      if(sbIsDayWord(t)) return;
+      let c=null, cd=1e9;
+      cols.forEach(function(o){ const d=Math.abs(w.cx-o.cx); if(d<cd){ cd=d; c=o; } });
+      if(!c || cd>gap*0.75) return;
+      const key=c.day+"|"+best.n;
+      if(!cells[key]) cells[key]={day:c.day, sec:best.n, lines:[], wide:false};
+      if(w.w>gap*1.35) cells[key].wide=true;
+      cells[key].lines.push({y:w.cy, x:w.cx, t:t});
+    });
+  });
+
+  /* 5. 单元格 → 课程（多行合并：名称在上，地点在最后一行） */
+  const list=Object.keys(cells).map(function(k){ return cells[k]; });
+  list.forEach(function(c){
+    c.lines.sort(function(a,b){ return a.y-b.y || a.x-b.x; });
+    const txt=c.lines.map(function(l){ return l.t; }).join(" ").replace(/\s+/g," ").trim();
+    const np=sbSplitNamePlace(txt);
+    out.push({name:np[0], place:np[1], day:c.day, sec:c.sec, span:1, raw:txt, wide:!!c.wide});
+  });
+
+  /* 6. 同一天同一门课跨连续节次 → 合并成一条 */
+  const merged=[];
+  out.sort(function(a,b){ return a.day-b.day || a.sec-b.sec; });
+  out.forEach(function(c){
+    const last=merged[merged.length-1];
+    if(last && last.day===c.day && last.name===c.name && c.sec===last.sec+last.span){
+      last.span+=1; last.place=last.place||c.place; last.raw+=" "+c.raw; return;
+    }
+    merged.push(c);
+  });
+  if(!merged.length) return rowList();   // 网格没解出来，退回按行罗列
+  return merged;
+}
+/* 把同一格的多段文字合并成课程；拆分课程名与地点 */
+function sbSplitNamePlace(txt){
+  let s=String(txt||"").replace(/\s+/g," ").trim();
+  let place="";
+  const m=s.match(/([\u4e00-\u9fa5A-Za-z]{0,6}(?:楼|操场|场馆|实验室|机房|教室|报告厅)\s*[\dA-Za-z-]*)$/);
+  const m2=s.match(/([A-Za-z]?\d{1,2}\s*-\s*\d{2,4})$/);
+  if(m){ place=m[1].trim(); s=s.slice(0,m.index).trim(); }
+  else if(m2){ place=m2[1].replace(/\s/g,""); s=s.slice(0,m2.index).trim(); }
+  else{
+    const m3=s.match(/([^\s@]{1,12})$/);
+    if(m3 && /[\d-]/.test(m3[1]) && /[一-龥]/.test(s.slice(0,m3.index))) { place=m3[1]; s=s.slice(0,m3.index).trim(); }
+  }
+  if(!s && place){ s=place; place=""; }
+  return [s||"未命名课程", place];
+}
+function sbOCRResultPage(list, rawText, imgData){
+  const B=S.sb, names=["周一","周二","周三","周四","周五","周六","周日"];
+  S.sb._ocrList = list;
+  S.sb._ocrImg = imgData||"";
+  let h=phead("识别结果 · 请核对","🔍","共识别 "+list.length+" 条，修改后再导入","返回","sbImportPage()");
+  if(imgData) h += "<div class='card'><img src='"+imgData+"' style='width:100%;border-radius:14px;border:1px solid var(--line)' alt='课表截图'></div>";
+  if(!list.length){
+    h += "<div class='card'><div class='empty'>没能识别出内容。<br>建议换一张清晰、端正的课表截图；也可以直接用下方「手动录入」。</div>"
+      + "<div class='row' style='margin-top:10px'><button onclick='sbImportPage()'>返回重试</button>"
+      + "<button class='ghost' onclick='sbCourseForm(null)'>手动加一门课</button></div></div>";
+    $("v-sb").innerHTML=h; return;
+  }
+  h += "<div class='card'><div class='note' style='margin:0'>下面是按图片位置还原的课程。地点多为自动识别，请随手改一下。</div></div>";
+  list.forEach(function(c,i){
+    const nm=c.name||"未命名课程", pl=c.place||"";
+    const secEnd=Math.min(B.slots.length||12, (c.sec||1)+Math.max(0,(c.span||1)-1));
+    h += "<div class='card' style='padding:12px'>"
+      + (c.wide? "<div class='note' style='margin:0 0 8px;background:#FFF3C4;color:#8a6410'>⚠️ 这格的文字在图片里横跨了相邻列，地点可能粘连，请核对</div>":"")
+      + "<div class='fld'><label class='f'>第 "+(i+1)+" 条 · 课程名称</label><input type='text' id='oc_n"+i+"' value='"+esc(nm)+"'></div>"
+      + "<div class='frm'><div class='fld'><label class='f'>地点</label><input type='text' id='oc_p"+i+"' value='"+esc(pl)+"'></div>"
+      + "<div class='fld'><label class='f'>星期</label><select id='oc_d"+i+"'>"
+      + names.map(function(n,k){ return "<option value='"+k+"'"+(c.day===k?" selected":"")+">"+n+"</option>"; }).join("")+"</select></div></div>"
+      + "<div class='frm'><div class='fld'><label class='f'>开始节</label><select id='oc_s"+i+"'>"
+      + B.slots.map(function(sl,k){ return "<option value='"+(k+1)+"'"+(c.sec===k+1?" selected":"")+">"+esc(sl[0])+"</option>"; }).join("")+"</select></div>"
+      + "<div class='fld'><label class='f'>结束节</label><select id='oc_e"+i+"'>"
+      + B.slots.map(function(sl,k){ return "<option value='"+(k+1)+"'"+(secEnd===k+1?" selected":"")+">"+esc(sl[0])+"</option>"; }).join("")+"</select></div></div>"
+      + "<div class='row'><button class='sm del' onclick='sbOCRDel("+i+")'>删除这条</button></div></div>";
+  });
+  h += "<div class='card'><div class='row' style='margin-bottom:10px'>"
+    + "<button onclick='sbOCRConfirm()'>✅ 确认导入这 "+list.length+" 门课</button>"
+    + "<button class='ghost' onclick='sbImportPage()'>取消</button></div>"
+    + "<div class='note' style='margin:0'>导入方式：<b>追加</b>到现有课表。</div></div>";
+  if(rawText){
+    h += "<div class='card'><h3><span class='ttl'>📝 原始识别文字</span><span class='hint'>供对照</span></h3>"
+      + "<div style='font-size:12px;color:var(--muted);line-height:1.7;white-space:pre-wrap;max-height:180px;overflow:auto'>"+esc(rawText.slice(0,1200))+"</div></div>";
+  }
+  $("v-sb").innerHTML=h;
+}
+function sbOCRDel(i){
+  const list=S.sb._ocrList||[];
+  list.splice(i,1);
+  S.sb._ocrList=list;
+  sbOCRResultPage(list, S.sb._ocrRaw||"", S.sb._ocrImg||"");
+}
+function sbOCRConfirm(){
+  const B=S.sb, list=B._ocrList||[];
+  if(!list.length){ toast("没有可导入的课程"); return; }
+  let n=0;
+  list.forEach(function(c,i){
+    const name=(($("oc_n"+i)&&$("oc_n"+i).value)||"").trim();
+    if(!name || name==="未命名课程") return;
+    B.courses.push({
+      id:Date.now()+Math.random(),
+      name:name,
+      teacher:"",
+      place:(($("oc_p"+i)&&$("oc_p"+i).value)||"").trim(),
+      day:parseInt(($("oc_d"+i)&&$("oc_d"+i).value)||0),
+      s:parseInt(($("oc_s"+i)&&$("oc_s"+i).value)||1),
+      e:parseInt(($("oc_e"+i)&&$("oc_e"+i).value)||1),
+      week:"all",
+      color:B.courses.length%5
+    });
+    n++;
+  });
+  B._ocrList=null; B._ocrImg=""; B._ocrRaw="";
+  save(); renderSB();
+  toast(n? ("已导入 "+n+" 门课") : "没有有效课程");
+}
+function sbOCRPage(file){
+  const B=S.sb;
+  const fr=new FileReader();
+  fr.onload=function(){
+    const img=fr.result;
+    S.sb._ocrImg=img;
+    let h=phead("正在识别","🔍","首次使用需下载中文识别包（约 15MB），请保持联网","取消","sbImportPage()");
+    h += "<div class='card'><img src='"+img+"' style='width:100%;border-radius:14px;border:1px solid var(--line)' alt='待识别截图'>"
+      + "<div style='margin-top:12px;background:var(--p100);border-radius:12px;height:8px;overflow:hidden'>"
+      + "<div id='ocrBar' style='height:100%;width:6%;background:var(--p400);transition:.3s'></div></div>"
+      + "<div id='ocrTxt' style='text-align:center;font-size:12.5px;color:var(--muted);margin-top:8px'>正在加载识别引擎…</div></div>";
+    $("v-sb").innerHTML=h;
+    sbLoadOCR(function(ok){
+      if(!ok){
+        $("v-sb").innerHTML=phead("无法识别","⚠️","识别引擎加载失败","返回","sbImportPage()")
+          + "<div class='card'><div class='empty'>网络没连上识别引擎。<br>请检查网络后重试，或用「手动录入 / JSON 导入」。</div>"
+          + "<div class='row' style='margin-top:10px'><button onclick='sbImportPage()'>返回</button>"
+          + "<button class='ghost' onclick='sbCourseForm(null)'>手动加课</button></div></div>";
+        return;
+      }
+      const setTxt=function(t){ const el=$("ocrTxt"); if(el) el.textContent=t; };
+      const setBar=function(p){ const el=$("ocrBar"); if(el) el.style.width=Math.max(6,Math.round(p*100))+"%"; };
+      setTxt("识别中，请稍候…");
+      Tesseract.recognize(img,"chi_sim+eng",{
+        logger:function(m){
+          if(m.status==="recognizing text"){ setBar(m.progress||0); setTxt("识别中 "+Math.round((m.progress||0)*100)+"%"); }
+          else if(m.status) setTxt("识别准备中…");
+        }
+      }).then(function(res){
+        const words=(res.data.words||[]).map(function(w){
+          return {text:w.text, x:w.bbox.x0, y:w.bbox.y0, w:(w.bbox.x1-w.bbox.x0), h:(w.bbox.y1-w.bbox.y0)};
+        });
+        const list=sbParseWords(words);
+        const raw=(res.data.text||"").trim();
+        S.sb._ocrRaw=raw;
+        sbOCRResultPage(list, raw, img);
+      }).catch(function(err){
+        $("v-sb").innerHTML=phead("识别失败","⚠️","图片没能识别出来","返回","sbImportPage()")
+          + "<div class='card'><div class='empty'>识别出错："+esc(err&&err.message||err)+"<br>建议换一张更清晰的截图再试。</div>"
+          + "<div class='row' style='margin-top:10px'><button onclick='sbImportPage()'>返回</button></div></div>";
+      });
+    });
+  };
+  fr.readAsDataURL(file);
+}
+
+/* ============ 导出到手机系统日历（ICS，含课前闹钟提醒） ============ */
+/* TEXT 转义：反斜杠 / 分号 / 逗号 / 换行 —— 缺这一步会让整个文件报废 */
+function sbICSEsc(s){
+  let t=String(s==null?"":s);
+  t=t.replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g," ");   // 清控制字符
+  t=t.replace(/\\/g,"\\\\");
+  t=t.replace(/\r?\n/g,"\\n");
+  t=t.replace(/;/g,"\\;").replace(/,/g,"\\,");
+  return t.trim();
+}
+/* 按 RFC5545 折行：每行不超过 75 字节（汉字 3 字节），续行以空格开头 */
+function sbICSFold(line){
+  try{
+    const te=new TextEncoder();
+    if(te.encode(line).length<=75) return [line];
+  }catch(e){ if(line.length<=75) return [line]; }
+  const te=new TextEncoder();
+  const out=[]; let cur="", curB=0, first=true;
+  for(const ch of line){
+    const b=te.encode(ch).length;
+    const lim=first?75:74;                       // 续行要算上开头的空格
+    if(curB+b>lim){ out.push((first?"":" ")+cur); cur=""; curB=0; first=false; }
+    cur+=ch; curB+=b;
+  }
+  if(cur) out.push((first?"":" ")+cur);
+  return out;
+}
+function sbICSStamp(){
+  const p=function(n){ return String(n).padStart(2,"0"); }, d=new Date();
+  return d.getUTCFullYear()+p(d.getUTCMonth()+1)+p(d.getUTCDate())+"T"+p(d.getUTCHours())+p(d.getUTCMinutes())+p(d.getUTCSeconds())+"Z";
+}
+/* 生成日历文本；返回 {ok, text, n, skipped, errs} */
+function sbICSBuild(){
+  const B=S.sb, out={ok:false, text:"", n:0, skipped:[], errs:[]};
+  if(!B.courses || !B.courses.length){ out.errs.push("还没有课程"); return out; }
+  if(!B.term || !B.term.start){ out.errs.push("还没填开学日期"); return out; }
+  const weeks=Math.max(1, B.term.weeks||18);
+  const base=sbTermBase();
+  const nSlots=B.slots.length||12;
+  let rm=parseInt(B.remind);
+  if(isNaN(rm) || rm<0) rm=10;
+  if(rm>180) rm=180;
+  const lines=[];
+  lines.push("BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//YiFan Workbench//Schedule//CN",
+             "CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:一凡的课表","X-WR-CALDESC:由一凡工作台导出");
+  function fmtDT(d,hm){ return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+"T"+hm.replace(":","")+"00"; }
+  function firstDate(day, startWeek){ return new Date(base.getTime()+((startWeek-1)*7+day)*86400000); }
+  const seen={};
+  B.courses.forEach(function(c,i){
+    const name=String(c.name||"").trim();
+    if(!name || name==="未命名课程"){ out.skipped.push((i+1)+" · 无名称"); return; }
+    if(c.day==null || c.day<0 || c.day>6){ out.skipped.push(name+" · 星期非法"); return; }
+    let s=parseInt(c.s)||1, e=parseInt(c.e)||1;
+    if(s<1) s=1; if(s>nSlots) s=nSlots;
+    if(e<1) e=1; if(e>nSlots) e=nSlots;
+    if(e<s) e=s;                                        // 结束早于开始 → 纠正，否则整条事件会被判非法
+    const st=B.slots[s-1]||B.slots[0], en=B.slots[e-1]||B.slots[0];
+    if(!st || !en || !st[1] || !en[2]){ out.skipped.push(name+" · 节次时间缺失"); return; }
+    let interval=1, startWeek=1, count=weeks;
+    if(c.week==="odd"){ interval=2; startWeek=1; count=Math.ceil(weeks/2); }
+    else if(c.week==="even"){ interval=2; startWeek=2; count=Math.floor(weeks/2); }
+    if(count<1){ out.skipped.push(name+" · 周次为空"); return; }
+    const d=firstDate(c.day, startWeek);
+    const now=Date.now();
+    const uid=("c"+String(c.id||i).replace(/[^0-9A-Za-z_-]/g,"")+"-"+now+"@yifan.workbench");
+    if(seen[uid]) return;
+    seen[uid]=1;
+    const wk=({all:"每周",odd:"单周",even:"双周"}[c.week]||"每周");
+    function push(prop,val){ sbICSFold(prop+":"+sbICSEsc(val)).forEach(function(l){ lines.push(l); }); }
+    lines.push("BEGIN:VEVENT");
+    lines.push("UID:"+uid);
+    lines.push("DTSTAMP:"+sbICSStamp());
+    lines.push("SEQUENCE:0","STATUS:CONFIRMED","TRANSP:OPAQUE");
+    lines.push("DTSTART:"+fmtDT(d,st[1]),"DTEND:"+fmtDT(d,en[2]));
+    lines.push("RRULE:FREQ=WEEKLY;INTERVAL="+interval+";COUNT="+count);
+    push("SUMMARY", name+(c.teacher? " ("+c.teacher+")":""));
+    if(c.place) push("LOCATION", c.place);
+    push("DESCRIPTION", "第"+s+(e>s?("-"+e):"")+"节 · "+wk+(c.place?(" · "+c.place):""));
+    if(rm>0){
+      lines.push("BEGIN:VALARM","TRIGGER:-PT"+rm+"M","ACTION:DISPLAY");
+      push("DESCRIPTION", "上课提醒："+name);
+      lines.push("END:VALARM");
+    }
+    lines.push("END:VEVENT");
+    out.n++;
+  });
+  if(!out.n){ out.errs.push("没有可以导出的有效课程"); return out; }
+  lines.push("END:VCALENDAR");
+  out.text=lines.join("\r\n")+"\r\n";
+  out.remind=rm;
+  out.weeks=weeks;
+  out.ok=true;
+  return out;
+}
+function sbICS(){
+  const r=sbICSBuild();
+  if(!r.ok){ toast(r.errs[0]||"导出失败"); 
+    if(r.errs[0]==="还没填开学日期"){ toast("先在「课表设置」填开学日期"); sbSetPage(); }
+    return; }
+  S.sb._ics=r.text;
+  sbICSPage(r);
+}
+function sbICSPage(r){
+  const B=S.sb, r2=r||sbICSBuild();
+  const txt=S.sb._ics||r2.text;
+  let h=phead("导出到手机日历","📆","共 "+r2.n+" 门课 · 每节课前 "+r2.remind+" 分钟提醒","返回","sbBack()");
+  h += "<div class='card'><div style='font-size:13.5px;line-height:1.9'>"
+    + "✅ 已生成标准日历文件（<b>"+esc(r2.n)+"</b> 门课，重复 "+esc(r2.weeks)+" 周）。<br>"
+    + "选下面<b>任意一种</b>方式把它放进手机日历，之后就是<b>系统响铃</b>，锁屏也会提醒。"
+    + (r2.skipped.length? "<br><span style='color:#b06ab3'>跳过 "+esc(r2.skipped.length)+" 条无效课程："+esc(r2.skipped.slice(0,3).join("、"))+"</span>":"")
+    + "</div></div>";
+  h += "<div class='card'>"
+    + "<div class='row'><button onclick='sbICSDownload()'>📥 下载 .ics 文件</button>"
+    + "<button class='soft' onclick='sbICSCopy()'>📋 复制内容</button></div>"
+    + "<div class='row' style='margin-top:9px'><button class='ghost' onclick='sbICSOpen()'>📅 直接用日历应用打开</button></div>"
+    + "<div class='note' style='margin:10px 0 0'>文件名已用英文名，避免部分安卓机型认不出中文名。</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>📱 导入步骤</span><span class='hint'>按你的手机来</span></h3>"
+    + "<div style='font-size:13px;line-height:1.95'>"
+    + "<b>安卓（华为 / 小米 / OPPO 等）</b><br>"
+    + "下载后下拉通知栏 → 点开这个文件 → 选「日历」打开；或进「文件管理 → 下载」，找到 <b>yifan-schedule.ics</b> 点一下。<br><br>"
+    + "<b>苹果 iPhone</b><br>"
+    + "下载后右上角进「下载」→ 点 <b>yifan-schedule.ics</b> → 「添加到日历」。<br><br>"
+    + "<b>如果是在微信里打开的</b><br>"
+    + "微信自带浏览器下载经常失败或找不到文件。请点右上角「···」→ <b>在浏览器中打开</b>，再重新导出。"
+    + "</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>🩺 还是不行？试试这两招</span></h3>"
+    + "<div style='font-size:13px;line-height:1.95'>"
+    + "① 点「复制内容」→ 粘到备忘录／发给自己邮箱 → 在电脑上存成 <b>.ics</b> 再传到手机，一样的。<br>"
+    + "② 换个浏览器重导一次（Chrome / 手机自带浏览器最稳）。"
+    + "</div>"
+    + "<div class='row' style='margin-top:10px'><button class='ghost sm' onclick='sbICS()'>重新导出</button>"
+    + "<button class='ghost sm' onclick='sbManagePage()'>回去改课程</button></div></div>";
+  $("v-sb").innerHTML=h;
+}
+function sbICSDownload(){
+  const txt=S.sb._ics;
+  if(!txt){ toast("请先重新导出"); sbICS(); return; }
+  try{
+    sbDownload(txt, "yifan-schedule.ics", "text/calendar");
+    toast("已下载 yifan-schedule.ics");
+  }catch(e){ sbICSCopy(); toast("改用复制方式"); }
+}
+function sbICSCopy(){
+  const txt=S.sb._ics;
+  if(!txt){ toast("请先重新导出"); return; }
+  const done=function(){ toast("已复制，粘贴后保存为 .ics 即可"); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(function(){ sbICSFallbackCopy(txt, done); });
+  }else sbICSFallbackCopy(txt, done);
+}
+function sbICSFallbackCopy(txt, done){
+  try{
+    const ta=document.createElement("textarea");
+    ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove(); done();
+  }catch(e){ toast("复制失败，请手动选择下方文本"); }
+}
+function sbICSOpen(){
+  const txt=S.sb._ics;
+  if(!txt){ toast("请先重新导出"); return; }
+  try{
+    const url="data:text/calendar;charset=utf-8,"+encodeURIComponent(txt);
+    const a=document.createElement("a");
+    a.href=url; a.target="_blank"; a.rel="noopener";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ toast("已唤起打开方式，请选择日历 App"); },400);
+  }catch(e){ toast("唤起失败，请改用下载或复制"); }
+}
+
+/* ============ 定时提醒检查（每分钟） ============ */
+function sbTick(){
+  const B=S.sb;
+  if(!B.notify && !B.alarmOn) return;
+  const now=new Date();
+  const hhmm=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  const ds=dstr(now);
+  B.notified = B.notified || {};
+  if(B.alarmOn && B.alarm===hhmm && B.alarmLast!==ds){
+    B.alarmLast=ds; save();
+    sbFire("⏰ 早起闹钟","该起床啦，今天也要加油！");
+  }
+  if(B.notify){
+    const list=sbDayCourses(ds, sbCurWeek());
+    list.forEach(function(c){
+      const st=B.slots[c.s-1]; if(!st) return;
+      const mins=(parseInt(st[1].slice(0,2))*60+parseInt(st[1].slice(3)))-(now.getHours()*60+now.getMinutes());
+      const day=B.notified[ds]||[];
+      if(mins>0 && mins<=(B.remind||10) && day.indexOf(String(c.id))<0){
+        B.notified[ds]=day.concat([String(c.id)]);
+        save();
+        sbFire("🔔 "+c.name+" 马上上课", "还有 "+mins+" 分钟 · "+st[1]+" 上课"+(c.place? " @"+c.place:""));
+      }
+    });
+  }
+}
+
+/* ==================== 图表 ==================== */
+function lineSvg(vals, unit, goal){
+  const W=640,H=170,pad=30;
+  if(vals.length<2) return "";
+  let mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals);
+  if(goal){ mx=Math.max(mx,goal); mn=Math.min(mn,goal); }
+  if(mx===mn){ mx=mx+1; mn=mn-1; }
+  const pts = vals.map((v,i)=>{
+    const x = pad + i*((W-pad*2)/(vals.length-1));
+    const y = H-34 - (v-mn)/(mx-mn)*(H-60);
+    return [x,y];
+  });
+  let dots="";
+  pts.forEach((p,i)=>{
+    if(i===0||i===pts.length-1) dots += "<circle cx='"+p[0].toFixed(1)+"' cy='"+p[1].toFixed(1)+"' r='4' fill='#F2789F'/>";
+    if(i===pts.length-1) dots += "<text x='"+p[0].toFixed(1)+"' y='"+(p[1]-9).toFixed(1)+"' font-size='11' text-anchor='end' fill='#4A3B42'>"+vals[i]+unit+"</text>";
+  });
+  let gl="";
+  if(goal){ const gy = H-34 - (goal-mn)/(mx-mn)*(H-60);
+    gl = "<line x1='"+pad+"' y1='"+gy.toFixed(1)+"' x2='"+(W-pad)+"' y2='"+gy.toFixed(1)+"' stroke='#A8E6CF' stroke-dasharray='5 4'/>"
+       + "<text x='"+(W-pad)+"' y='"+(gy-5).toFixed(1)+"' font-size='10' text-anchor='end' fill='#4FAE86'>目标 "+goal+unit+"</text>"; }
+  return "<svg viewBox='0 0 "+W+" "+H+"' style='width:100%;height:auto'>"
+    + "<line x1='"+pad+"' y1='"+(H-34)+"' x2='"+(W-pad)+"' y2='"+(H-34)+"' stroke='#F6E2E9'/>"
+    + gl
+    + "<polyline points='"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")+"' fill='none' stroke='#F2789F' stroke-width='2.5' stroke-linejoin='round'/>"
+    + dots + "</svg>";
+}
+
+/* ==================== 启动 ==================== */
+/* 逐个渲染并单独兜错：某一页出错时只在那一页提示，不影响其它页面 */
+/* ============ 装到手机桌面（PWA 安装引导） ============ */
+let PWA_EVT=null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); PWA_EVT=e; if(typeof renderInstall==="function") renderInstall(); });
+window.addEventListener("appinstalled", function(){ PWA_EVT=null; toast("安装成功，去桌面打开吧 🎉"); if(typeof renderInstall==="function") renderInstall(); });
+function pwaIsStandalone(){
+  try{
+    return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)
+      || (window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches)
+      || navigator.standalone===true;
+  }catch(e){ return false; }
+}
+function pwaIsIOS(){
+  const ua=navigator.userAgent||"";
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && (navigator.maxTouchPoints||0)>1);
+}
+function pwaIsInApp(){
+  const ua=navigator.userAgent||"";
+  return /MicroMessenger|QQ\/|QQBrowser|Weibo|DingTalk|AlipayClient/.test(ua);
+}
+function renderInstall(){
+  const el=$("v-install"); if(!el) return;
+  const ios=pwaIsIOS(), installed=pwaIsStandalone(), wx=pwaIsInApp();
+  let h=phead("装到手机桌面","📲","装好后从桌面图标打开，全屏无地址栏，像真 App 一样","重新检测","renderInstall()");
+  if(installed){
+    h += "<div class='card'><h3><span class='ttl'>✅ 已经装好了</span><span class='hint'>当前就是桌面模式</span></h3>"
+      + "<div style='font-size:13.5px;line-height:1.9'>你现在就是从桌面图标打开的（全屏、无地址栏）。<br>"
+      + "数据都存在本机，更新内容后重新打开就是最新版。</div></div>";
+  }else if(wx){
+    h += "<div class='card' style='border:1px solid var(--p300)'><h3><span class='ttl'>⚠️ 请先用浏览器打开</span></h3>"
+      + "<div style='font-size:13.5px;line-height:1.95'>检测到你在<b>微信 / QQ 内置浏览器</b>里，这里装不了。<br>"
+      + "请点右上角「<b>···</b>」→ 选「<b>在浏览器中打开</b>」，再回来点安装。</div></div>";
+  }else if(ios){
+    h += "<div class='card'><h3><span class='ttl'>🍎 iPhone 三步装好</span><span class='hint'>必须用 Safari</span></h3>"
+      + "<div style='font-size:13.5px;line-height:2.05'>"
+      + "<b>1.</b> 用 <b>Safari</b> 打开这个页面（微信里打不开，先「在浏览器中打开」）<br>"
+      + "<b>2.</b> 点底部中间的「<b>分享</b>」按钮 <span style='font-size:15px'>⬆️</span><br>"
+      + "<b>3.</b> 往下划，选「<b>添加到主屏幕</b>」→ 右上角「添加」<br><br>"
+      + "桌面上就会出现「一凡」图标，点开全屏运行，离线也能用。</div></div>";
+  }else{
+    const can=PWA_EVT?"one":"no";
+    h += "<div class='card'><h3><span class='ttl'>🤖 安卓一键安装</span><span class='hint'>推荐</span></h3>"
+      + (can==="one"
+        ? "<div class='row' style='margin:6px 0 4px'><button onclick='pwaInstall()'>📲 立即安装到桌面</button></div>"
+        : "<div style='font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:8px'>浏览器当前没给出一键安装入口，用下面的手动方式，效果一样。</div>")
+      + "<div style='font-size:13.5px;line-height:2.05'>"
+      + "<b>手动方式：</b>点浏览器右上角「<b>⋮</b>」菜单 → 选「<b>添加到主屏幕</b>」或「<b>安装应用</b>」。<br>"
+      + "（Chrome / Edge / 华为 / 小米自带浏览器都支持）</div></div>";
+    h += "<div class='card'><h3><span class='ttl'>📦 想要真正的 APK？</span></h3>"
+      + "<div style='font-size:13px;line-height:1.9'>已经帮你把安装包做好了，见对话里的下载卡片。装 APK 和「添加到主屏幕」<b>功能完全一样</b>，只是 APK 能发给别人、能在应用列表里看到。</div></div>";
+  }
+  h += "<div class='card'><h3><span class='ttl'>❓ 几个常见问题</span></h3>"
+    + "<div style='font-size:13px;line-height:1.95'>"
+    + "<b>装了之后数据会丢吗？</b><br>不会。数据存在手机本机，装不装都一样。但<b>卸载 / 清缓存会丢</b>，记得定期用课表的「导出 JSON」备份。<br><br>"
+    + "<b>换手机怎么搬？</b><br>旧手机「导出 JSON」→ 发给新手机 → 在课表页导入。<br><br>"
+    + "<b>内容会自动更新吗？</b><br>会。每天自动换新的计划、单词、题目；代码更新后重新打开就是最新版。"
+    + "</div></div>";
+  el.innerHTML=h;
+}
+function pwaInstall(){
+  if(!PWA_EVT){ toast("请从浏览器菜单里选「添加到主屏幕」"); return; }
+  PWA_EVT.prompt();
+  PWA_EVT.userChoice.then(function(r){
+    if(r && r.outcome==="accepted") toast("正在安装…");
+    else toast("已取消，可随时再来");
+    PWA_EVT=null; renderInstall();
+  });
+}
+
+/* ============ 使用说明 ============ */
+function renderGuide(){
+  const el=$("v-guide"); if(!el) return;
+  const m=S.meta||{};
+  let h=phead("使用说明","❓","九个模块分别怎么用 · 数据在哪 · 怎么备份","回到今天","go('plan')");
+  h += "<div class='card'><h3><span class='ttl'>🧭 这是什么</span></h3>"
+    + "<div style='font-size:13.5px;line-height:1.9'>"
+    + "考研 + 资产评估 + 省考，一屏管完的工作台。九个模块，左边点一下就换页。<br>"
+    + "所有内容<b>实时存在这台手机本机</b>，不上传任何服务器；单词、题目、素材<b>每天 0 点自动换新</b>。"
+    + "</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>📚 九个模块</span><span class='hint'>点开左边对应项</span></h3>"
+    + "<div style='font-size:13px;line-height:1.85'>"
+    + "<b>📋 每日计划</b> — 今日任务清单、坚持打卡、体重与饮食记录、普拉提跟练，可翻「历史记录」。<br>"
+    + "<b>📖 考研英语</b> — 每天 30 词 + BBC 听力跟读，背过的进「我的词汇本」。<br>"
+    + "<b>📊 资产评估</b> — 每天 10 题自动轮换，做错的进「错题本」。<br>"
+    + "<b>✏️ 国考行测</b> — 资料分析 / 判断推理 / 言语理解 / 数量关系四大专项，每日真题更新。<br>"
+    + "<b>🎬 创作复盘</b> — 每天 9:00 更新灵感，附赛道解析与创作思路。<br>"
+    + "<b>🖋️ 申论素材</b> — 每日金句 + 时评，分领域收纳，喜欢的进「我的摘抄本」。<br>"
+    + "<b>📐 考研数学</b> — 数一章节考点、历年真题、组合刷题，错题自动归档。<br>"
+    + "<b>💻 408考研</b> — 四科考点打卡清单、随机抽题、复习日历、错题统计、CSV 导出。<br>"
+    + "<b>🗓️ 课表管理</b> — 课表、周次、调休、课前提醒，可导出到手机系统日历当闹钟用。"
+    + "</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>🗓️ 课表几个重点功能</span></h3>"
+    + "<div style='font-size:13px;line-height:1.9'>"
+    + "· <b>📷 图片识别导入</b>：上传教务系统或超级课程表的<b>周课表网格截图</b>，自动认出课程名 / 星期 / 节次 / 地点，核对后一键导入。<br>"
+    + "· <b>📆 导出日历</b>：生成 .ics 文件，放进手机日历后<b>每节课前系统响铃</b>，锁屏也会提醒。<br>"
+    + "· 课表里还有 <b>❓ 帮助文档</b> 一页，19 个功能逐个说明。"
+    + "</div>"
+    + "<div class='row' style='margin-top:10px'><button class='sm' onclick=\"go('sb')\">去课表</button></div></div>";
+  h += "<div class='card'><h3><span class='ttl'>💾 数据在哪 / 怎么备份</span><span class='hint'>重要</span></h3>"
+    + "<div style='font-size:13px;line-height:1.9'>"
+    + "· 数据存在<b>本机浏览器 / App 里</b>，换手机、卸载 App、清理缓存会<b>丢失</b>。<br>"
+    + "· 备份方法：<b>课表管理 → 分享课表 → 导出 JSON</b>，把文件发给自己；换设备时导入即可。<br>"
+    + "· 装了 APK 后<b>数据是空的</b>，需要把旧环境导出的 JSON 导入进来。<br>"
+    + "· 打卡照片也只存在本机，不会上传。"
+    + "</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>📲 装到手机桌面 / APK</span></h3>"
+    + "<div style='font-size:13px;line-height:1.9'>点左边「📲 装到桌面」，会按你的手机给出对应步骤（安卓一键安装、iPhone 用 Safari 添加；微信里打开会提示你先用浏览器）。"
+    + "</div><div class='row' style='margin-top:10px'><button class='sm' onclick=\"go('install')\">看安装步骤</button></div></div>";
+  h += "<div class='card'><h3><span class='ttl'>🗂 408 刷题库（Obsidian 版）</span><span class='hint'>另一套方案</span></h3>"
+    + "<div style='font-size:13px;line-height:1.9'>"
+    + "工作台里的「💻 408考研」已经把打卡清单、抽题、日历、错题统计做进来了。<br>"
+    + "如果你还想用 <b>Obsidian + Dataview</b> 那套（适合平板上手写演算、按章节写错题笔记），文件夹在 <b>408刷题库/</b>，里面的 <b>README-使用说明.md</b> 是它的说明书，需要装 Dataview 插件。<br>"
+    + "<span style='color:var(--muted)'>两套互相独立，数据不互通，用哪套都行。</span>"
+    + "</div></div>";
+  h += "<div class='card'><h3><span class='ttl'>🙋 常见问题</span></h3>"
+    + "<div style='font-size:13px;line-height:1.95'>"
+    + "<b>Q：内容什么时候更新？</b><br>每日计划、单词、题目、素材都是每天 0 点自动换新，同一天内不会变。<br><br>"
+    + "<b>Q：换了手机怎么办？</b><br>旧手机导出 JSON → 发给新手机 → 在课表页导入。<br><br>"
+    + "<b>Q：为什么图片识别要等很久？</b><br>第一次用要下载约 15MB 的中文识别包，之后就秒开。请连着网、用清晰端正的<b>网格截图</b>。<br><br>"
+    + "<b>Q：日历文件导不进去？</b><br>用英文名 <b>yifan-schedule.ics</b> 下载后，在点开时选择「日历」打开；微信里请先「在浏览器中打开」。"
+    + "</div></div>";
+  if(m.examName || m.examDate){
+    h += "<div class='card'><div style='font-size:12.5px;color:var(--muted);line-height:1.8'>"
+      + "当前目标：<b>"+esc(m.examName||"")+"</b>"+(m.examDate? " · 考试日 "+esc(m.examDate):"")
+      + "（可在每日计划页修改）</div></div>";
+  }
+  el.innerHTML=h;
+}
+
+const VIEWS = {"plan":renderPlan,"eng":renderEng,"asset":renderAsset,"xg":renderXG,"create":renderCreate,"sl":renderSL,"math":renderMath,"cs408":renderCS408,"sb":renderSB,"install":renderInstall,"guide":renderGuide};
+function renderAll(){
+  const bad = [];
+  for(const k in VIEWS){
+    try{ VIEWS[k](); }
+    catch(e){
+      bad.push(k);
+      console.error("["+k+"] 渲染失败:", e);
+      const el = document.getElementById("v-"+k);
+      if(el) el.innerHTML = "<div class='card'><h3><span class='ttl'>⚠️ 这一页渲染出错了</span></h3>"
+        + "<div class='empty'>其它页面不受影响，可先继续使用。<br><span style='font-size:11px'>"+esc(e && e.message || e)+"</span></div>"
+        + "<div class='row' style='margin-top:10px'><button onclick='renderAll();go(\""+k+"\")'>重新加载这一页</button></div></div>";
+    }
+  }
+  if(bad.length) toast("有页面渲染异常，已单独提示");
+  return bad;
+}
+renderAll();
+
+try{ sbTick(); }catch(e){}
+setInterval(function(){ try{ sbTick(); }catch(e){} }, 60000);
+
+let lastDay = today();
+setInterval(()=>{
+  if(today()!==lastDay){ lastDay=today(); renderAll(); toast("新的一天，内容已更新 ✨"); }
+}, 60000);
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
+</script>
+</body>
+</html>
